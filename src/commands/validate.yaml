@@ -1,0 +1,20 @@
+# src/commands/validate.yaml
+
+description: Confirm canonical format and validate terraform syntax.
+  
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+
+steps:
+  - run:
+      name: confirm canonical format of terraform files
+      working_directory: << parameters.working-directory >>
+      command: terraform fmt -check=false
+  - run:
+      name: validate terraform files
+      working_directory: << parameters.working-directory >>
+      command: terraform validate

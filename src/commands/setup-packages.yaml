@@ -1,0 +1,23 @@
+# src/commands/setup-packages.yaml
+
+description: >
+  Install specified terraform version on executor. Keep in mind that the install will use sudo
+  since it assumes the container is running under a defined USER.
+
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+
+  terraform-version:
+    description: must provide the release version of terraform
+    type: string
+
+steps:
+  - run:
+      name: install terraform
+      command: |
+        curl -SLO "https://releases.hashicorp.com/terraform/<< parameters.terraform-version >>/terraform_<< parameters.terraform-version >>_linux_amd64.zip" > "terraform_<< parameters.terraform-version >>_linux_amd64.zip"
+        sudo unzip "terraform_<< parameters.terraform-version >>_linux_amd64.zip" -d /usr/local/bin

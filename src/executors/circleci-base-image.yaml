@@ -1,0 +1,27 @@
+# src/executors/circleci-base-image.yaml
+
+description: |
+  The orb commands will use dockerized versions of terraform and the other orb capabilities.
+
+  The executor used for these jobs should include any packages needed by your job configuration.
+  Examples include tools for accessing secrets or referenced in job lifecycle hooks. Currently
+  only linux based images are supported.
+
+  The DPS circleci-base-image will be used by default.
+  
+  See https://github.com/ThoughtWorks-DPS/circleci-base-image
+
+parameters:
+  executor-image:
+    description: available override
+    type: string
+
+  resource-class:
+    type: enum
+    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    default: medium
+
+resource_class: << parameters.resource-class >>
+
+docker:
+  - image: << parameters.executor-image >>

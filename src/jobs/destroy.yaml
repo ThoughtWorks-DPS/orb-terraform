@@ -1,0 +1,109 @@
+# /src/jobs/destroy.yaml
+
+description: >
+  Terraform destroy workflow.
+  
+  Includes the following optional customizations:
+
+  - reference your own executor docker image
+  - set an executor resource-class, default is medium
+  - set the executor shell process launch configuration, default is '/bin/sh -eo pipefail'
+  - specify a working-directory, default is .
+  - select a terraform workspace, default is none
+
+executor:
+  name: circleci-base-image
+  executor-image: << parameters.executor-image >>
+  resource-class: << parameters.resource-class >>
+
+environment:
+  TF_WORKSPACE: << parameters.workspace >>
+shell: << parameters.shell >>
+
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+
+  workspace:
+    description: set terraform workspace infrastructure environment
+    type: string
+    default: ""
+
+  executor-image:
+    description: available override
+    type: string
+    default: docker.io/twdps/circleci-base-image:alpine-stable
+
+  resource-class:
+    type: enum
+    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    default: medium
+
+  shell:
+    description: default shell invocation. Override to support different shells or tools like secrethub.io
+    type: string
+    default: /bin/sh -eo pipefail
+
+  terraform-version:
+    description: must provide the release version of terraform
+    type: string
+  
+  var-file:
+    description: terraform variable file to include in plan
+    type: string
+    default: ""
+
+  backend-conf:
+    description: additional terraform init parameters to configure backend.conf if necessary
+    type: string
+    default: ""
+
+  before-terraform:
+    description: Optional steps to run before running terraform
+    type: steps
+    default: []
+
+  after-terraform-init:
+    description: Optional steps to run after terraform init but before running terraform plan
+    type: steps
+    default: []
+
+  after-terraform:
+    description: Optional steps to run after running terraform plan
+    type: steps
+    default: []
+
+steps:
+  - checkout
+  - setup_remote_docker
+  - setup-packages:
+      working-directory: << parameters.working-directory >>
+      terraform-version: << parameters.terraform-version >>
+  - when:
+      name: Run before-terraform lifecycle hook steps
+      condition: << parameters.before-terraform >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.before-terraform >>
+  - run:
+      name: terraform init
+      working_directory: << parameters.working-directory >>
+      command: |
+        terraform version
+        terraform init <<#parameters.backend-conf>> << parameters.backend-conf >> <</parameters.backend-conf>>
+  - when:
+      name: Run after-terraform-init lifecycle hook steps
+      condition: << parameters.after-terraform-init >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.after-terraform-init >>
+  - run:
+      name: terraform destroy
+      working_directory: << parameters.working-directory >>
+      command: terraform destroy <<#parameters.var-file>> -var-file=<< parameters.var-file >> <</parameters.var-file>> --auto-approve
+  - when:
+      name: Run after-terraform lifecycle hook steps
+      condition: << parameters.after-terraform >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.after-terraform >>

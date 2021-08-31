@@ -1,0 +1,44 @@
+# src/commands/lint.yaml
+
+description: |
+  Run terraform-linters/tflint in working-directory.
+  
+  Overrides available:
+  - use tflint-version parameter to use a specific version of tflint; default is latest
+  - generates a .tflint.hcl config file to support the tflint-provider specified
+  - You can fully manage configuration by maintaining .tflint.hcl in your repo
+  - if you include a .tflint.hcl file, be sure to specify a provider; e.g., plugin "aws" { enabled = true }
+  
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+
+  tflint-version:
+    description: optional override to a specific release version of tflint
+    type: string
+    default: 'latest'
+
+  tflint-provider:
+    description: provider for tflint plugin
+    type: enum
+    enum: ["aws", "azurerm", "google"]
+    default: aws
+
+steps:
+  - run:
+      name: set tflint provider
+      command: |
+        if [[ ! -f "<< parameters.working-directory >>/.tflint.hcl" ]]; then
+          echo "plugin \"<< parameters.tflint-provider >>\" { enabled = true }" > .tflint.hcl
+        else
+          echo ".tflint.hcl already exists in working directory"
+        fi
+  - run:
+      name: lint terraform files
+      working_directory: << parameters.working-directory >>
+      command: |
+        docker run ghcr.io/terraform-linters/tflint-bundle:<< parameters.tflint-version >> --version
+        docker run --rm -v $(pwd):/data -t ghcr.io/terraform-linters/tflint-bundle:<< parameters.tflint-version >>
