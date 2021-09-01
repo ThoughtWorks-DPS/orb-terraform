@@ -5,7 +5,7 @@ description: >
   
   Includes the following optional customizations:
 
-  - reference your own executor docker image
+  - reference your own docker image executor 
   - set an executor resource-class, default is medium
   - set the executor shell process launch configuration, default is '/bin/sh -eo pipefail'
   - set a desired version and provider for tflint, default is latest and aws
@@ -14,7 +14,7 @@ description: >
   - turn off terraform fmt and validate checks
 
 executor:
-  name: circleci-base-image
+  name: circleci-executor-builder
   executor-image: << parameters.executor-image >>
   resource-class: << parameters.resource-class >>
 
@@ -37,7 +37,7 @@ parameters:
   executor-image:
     description: available override
     type: string
-    default: docker.io/twdps/circleci-base-image:alpine-stable
+    default: docker.io/twdps/circleci-executor-builder:alpine-stable
 
   resource-class:
     type: enum

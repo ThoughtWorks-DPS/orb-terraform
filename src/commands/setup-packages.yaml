@@ -1,8 +1,11 @@
 # src/commands/setup-packages.yaml
 
 description: >
-  Install specified terraform version on executor. Keep in mind that the install will use sudo
-  since it assumes the container is running under a defined USER.
+  Install specified terraform version on executor.
+  
+  requirements:
+  - curl
+  - sudo. Keep in mind that the install will use sudo since it assumes the container is running as a defined USER.
 
 parameters:
 
