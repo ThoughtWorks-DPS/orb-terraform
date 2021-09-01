@@ -24,3 +24,4 @@ steps:
       command: |
         curl -SLO "https://releases.hashicorp.com/terraform/<< parameters.terraform-version >>/terraform_<< parameters.terraform-version >>_linux_amd64.zip" > "terraform_<< parameters.terraform-version >>_linux_amd64.zip"
         sudo unzip "terraform_<< parameters.terraform-version >>_linux_amd64.zip" -d /usr/local/bin
+        rm "terraform_<< parameters.terraform-version >>_linux_amd64.zip"
