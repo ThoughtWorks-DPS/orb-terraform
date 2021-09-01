@@ -12,7 +12,7 @@ description: >
   - select a terraform workspace, default is none
 
 executor:
-  name: circleci-base-image
+  name: circleci-executor-builder
   executor-image: << parameters.executor-image >>
   resource-class: << parameters.resource-class >>
 
