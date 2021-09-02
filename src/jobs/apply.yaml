@@ -35,7 +35,7 @@ parameters:
   executor-image:
     description: available override
     type: string
-    default: docker.io/twdps/circleci-base-image:alpine-stable
+    default: docker.io/twdps/circleci-executor-builder:alpine-stable
 
   resource-class:
     type: enum
