@@ -97,6 +97,11 @@ parameters:
 steps:
   - checkout
   - setup_remote_docker
+  - when:
+      name: Run before-terraform lifecycle hook steps
+      condition: << parameters.before-terraform >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.before-terraform >>
   - setup-packages:
       working-directory: << parameters.working-directory >>
       terraform-version: << parameters.terraform-version >>
@@ -104,11 +109,6 @@ steps:
       working-directory: << parameters.working-directory >>
       tflint-version: << parameters.tflint-version >>
       tflint-provider: << parameters.tflint-provider >>
-  - when:
-      name: Run before-terraform lifecycle hook steps
-      condition: << parameters.before-terraform >>
-      working_directory: << parameters.working-directory >>
-      steps: << parameters.before-terraform >>
   - run:
       name: terraform init
       working_directory: << parameters.working-directory >>

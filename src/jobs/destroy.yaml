@@ -79,14 +79,14 @@ parameters:
 steps:
   - checkout
   - setup_remote_docker
-  - setup-packages:
-      working-directory: << parameters.working-directory >>
-      terraform-version: << parameters.terraform-version >>
   - when:
       name: Run before-terraform lifecycle hook steps
       condition: << parameters.before-terraform >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-terraform >>
+  - setup-packages:
+      working-directory: << parameters.working-directory >>
+      terraform-version: << parameters.terraform-version >>
   - run:
       name: terraform init
       working_directory: << parameters.working-directory >>
