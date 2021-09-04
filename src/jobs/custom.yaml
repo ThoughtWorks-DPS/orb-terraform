@@ -1,0 +1,123 @@
+# /src/jobs/plan.yaml
+
+description: >
+  Custom terraform workflow. Install specified version of terraform, perform init, run custom commands.
+  
+  Includes the following optional customizations:
+
+  - reference your own docker image executor 
+  - set an executor resource-class, default is medium
+  - set the executor shell process launch configuration, default is '/bin/sh -eo pipefail'
+  - set a desired version and provider for tflint, default is latest and aws
+  - specify a working-directory, default is .
+  - select a terraform workspace, default is none
+  - turn off terraform fmt and validate checks
+  
+executor:
+  name: circleci-executor-builder
+  executor-image: << parameters.executor-image >>
+  resource-class: << parameters.resource-class >>
+
+environment:
+  TF_WORKSPACE: << parameters.workspace >>
+shell: << parameters.shell >>
+
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+
+  workspace:
+    description: set terraform workspace infrastructure environment
+    type: string
+    default: ""
+
+  executor-image:
+    description: available override
+    type: string
+    default: docker.io/twdps/circleci-executor-builder:alpine-stable
+
+  resource-class:
+    type: enum
+    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    default: medium
+
+  shell:
+    description: default shell invocation. Override to support different shells or tools like secrethub.io
+    type: string
+    default: /bin/sh -eo pipefail
+
+  terraform-version:
+    description: must provide the release version of terraform
+    type: string
+  
+  tflint-version:
+    description: optional override to a specific release version of tflint
+    type: string
+    default: 'latest'
+
+  tflint-provider:
+    description: provider for tflint plugin
+    type: enum
+    enum: ["aws", "azurerm", "google"]
+    default: aws
+
+  validate-terraform-fmt:
+    description: perform terraform fmt and validate
+    type: boolean
+    default: true
+
+  var-file:
+    description: terraform variable file to include in plan
+    type: string
+    default: ""
+
+  backend-conf:
+    description: additional terraform init parameters to configure backend.conf if necessary
+    type: string
+    default: ""
+
+  before-terraform:
+    description: Optional steps to run before running terraform
+    type: steps
+    default: []
+
+  after-terraform-init:
+    description: Optional steps to run after terraform init but before running terraform plan
+    type: steps
+    default: []
+
+steps:
+  - checkout
+  - setup_remote_docker
+  - when:
+      name: Run before-terraform lifecycle hook steps
+      condition: << parameters.before-terraform >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.before-terraform >>
+  - setup-packages:
+      working-directory: << parameters.working-directory >>
+      terraform-version: << parameters.terraform-version >>
+  - lint:
+      working-directory: << parameters.working-directory >>
+      tflint-version: << parameters.tflint-version >>
+      tflint-provider: << parameters.tflint-provider >>
+  - run:
+      name: terraform init
+      working_directory: << parameters.working-directory >>
+      command: |
+        terraform version
+        terraform init <<#parameters.backend-conf>> << parameters.backend-conf >> <</parameters.backend-conf>>
+  - when:
+      name: perform terraform fmt and validate
+      condition: << parameters.validate-terraform-fmt >>
+      steps:
+        - validate:
+            working-directory: << parameters.working-directory >>
+  - when:
+      name: Run after-terraform-init lifecycle hook steps
+      condition: << parameters.after-terraform-init >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.after-terraform-init >>
