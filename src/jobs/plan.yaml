@@ -73,6 +73,11 @@ parameters:
     description: terraform variable file to include in plan
     type: string
     default: ""
+  
+  extra-terraform-args:
+    description: additional command line arguements for terraform plan
+    type: string
+    default: ""
 
   backend-conf:
     description: additional terraform init parameters to configure backend.conf if necessary
@@ -129,7 +134,7 @@ steps:
   - run:
       name: terraform plan
       working_directory: << parameters.working-directory >>
-      command: terraform plan <<#parameters.var-file>> -var-file=<< parameters.var-file >> <</parameters.var-file>>
+      command: terraform plan <<#parameters.var-file>> -var-file=<< parameters.var-file >> <</parameters.var-file>> <<#parameters.extra-terraform-args>> << parameters.extra-terraform-args >> <</parameters.extra-terraform-args>>
   - when:
       name: Run after-terraform lifecycle hook steps
       condition: << parameters.after-terraform >>
