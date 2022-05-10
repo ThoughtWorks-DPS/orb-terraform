@@ -101,7 +101,7 @@ steps:
   - run:
       name: terraform apply
       working_directory: << parameters.working-directory >>
-      command: terraform apply <<#parameters.var-file>> -var-file=<< parameters.var-file >> <</parameters.var-file>> --auto-approve
+      command: terraform apply <<#parameters.var-file>> -var-file=<< parameters.var-file >> <</parameters.var-file>> <<#parameters.extra-terraform-args>> << parameters.extra-terraform-args >> <</parameters.extra-terraform-args>> --auto-approve
   - when:
       name: Run after-terraform lifecycle hook steps
       condition: << parameters.after-terraform >>
