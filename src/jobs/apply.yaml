@@ -56,6 +56,11 @@ parameters:
     type: string
     default: ""
 
+  extra-terraform-args:
+    description: additional command line arguements for terraform plan
+    type: string
+    default: ""
+
   backend-conf:
     description: additional terraform init parameters to configure backend.conf if necessary
     type: string
