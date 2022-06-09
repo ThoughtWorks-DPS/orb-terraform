@@ -2,10 +2,11 @@
 
 description: >
   Terraform plan workflow.
-  
+
   Includes the following optional customizations:
 
-  - reference your own docker image executor 
+  - set desired terraform version. Default is the version installed on the executor.
+  - reference your own docker image executor. Default is twdps/circleci-infra-aws
   - set an executor resource-class, default is medium
   - set the executor shell process launch configuration, default is '/bin/sh -eo pipefail'
   - set a desired version and provider for tflint, default is latest and aws
@@ -13,8 +14,11 @@ description: >
   - select a terraform workspace, default is none
   - turn off terraform fmt and validate checks
 
+  Keep in mind that latest or executor default versions will change. Pin terraform and tflint versions
+  to prevent if desired.
+
 executor:
-  name: circleci-executor-builder
+  name: circleci-infra-aws
   executor-image: << parameters.executor-image >>
   resource-class: << parameters.resource-class >>
 
@@ -37,7 +41,7 @@ parameters:
   executor-image:
     description: available override
     type: string
-    default: docker.io/twdps/circleci-executor-builder:alpine-stable
+    default: docker.io/twdps/circleci-infra-aws:alpine-stable
 
   resource-class:
     type: enum
@@ -52,6 +56,7 @@ parameters:
   terraform-version:
     description: must provide the release version of terraform
     type: string
+    default: ""
   
   tflint-version:
     description: optional override to a specific release version of tflint
@@ -108,7 +113,6 @@ steps:
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-terraform >>
   - setup-packages:
-      working-directory: << parameters.working-directory >>
       terraform-version: << parameters.terraform-version >>
   - lint:
       working-directory: << parameters.working-directory >>

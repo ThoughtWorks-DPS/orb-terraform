@@ -9,19 +9,18 @@ description: >
 
 parameters:
 
-  working-directory:
-    description: specific folder in which to run the commands
-    type: string
-    default: '.'
-
   terraform-version:
     description: must provide the release version of terraform
     type: string
+    default: ""
 
 steps:
-  - run:
-      name: install terraform
-      command: |
-        curl -SLO "https://releases.hashicorp.com/terraform/<< parameters.terraform-version >>/terraform_<< parameters.terraform-version >>_linux_amd64.zip" > "terraform_<< parameters.terraform-version >>_linux_amd64.zip"
-        sudo unzip -o "terraform_<< parameters.terraform-version >>_linux_amd64.zip" -d /usr/local/bin
-        rm "terraform_<< parameters.terraform-version >>_linux_amd64.zip"
+  - when:
+      condition: << parameters.terraform-version >>
+      steps:
+        - run:
+            name: install terraform
+            command: |
+              curl -SLO "https://releases.hashicorp.com/terraform/<< parameters.terraform-version >>/terraform_<< parameters.terraform-version >>_linux_amd64.zip" > "terraform_<< parameters.terraform-version >>_linux_amd64.zip"
+              sudo unzip -o "terraform_<< parameters.terraform-version >>_linux_amd64.zip" -d /usr/local/bin
+              rm "terraform_<< parameters.terraform-version >>_linux_amd64.zip"

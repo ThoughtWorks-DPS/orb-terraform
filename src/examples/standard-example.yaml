@@ -51,10 +51,10 @@ usage:
       steps:
         - run:
             name: set ~/.terraformrc
-            command: secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+            command: op inject -i tpl/terraformrc.tpl -o ~/.terraformrc
         - run:
             name: set << parameters.env >> environment variables
-            command: secrethub inject -i environments/<< parameters.env >>.auto.tfvars.json.tpl -o << parameters.env >>.auto.tfvars.json
+            command: op inject -i environments/<< parameters.env >>.auto.tfvars.json.tpl -o << parameters.env >>.auto.tfvars.json
 
   workflows:
     version: 2

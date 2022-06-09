@@ -5,14 +5,18 @@ description: >
   
   Includes the following optional customizations:
 
-  - reference your own executor docker image
+  - set desired terraform version. Default is the version installed on the executor.
+  - reference your own docker image executor. Default is twdps/circleci-infra-aws
   - set an executor resource-class, default is medium
   - set the executor shell process launch configuration, default is '/bin/sh -eo pipefail'
   - specify a working-directory, default is .
   - select a terraform workspace, default is none
 
+  Keep in mind that latest or executor default versions will change. Pin terraform version
+  to prevent if desired.
+
 executor:
-  name: circleci-executor-builder
+  name: circleci-infra-aws
   executor-image: << parameters.executor-image >>
   resource-class: << parameters.resource-class >>
 
@@ -35,7 +39,7 @@ parameters:
   executor-image:
     description: available override
     type: string
-    default: docker.io/twdps/circleci-executor-builder:alpine-stable
+    default: docker.io/twdps/circleci-infra-aws:alpine-stable
 
   resource-class:
     type: enum
@@ -50,6 +54,7 @@ parameters:
   terraform-version:
     description: must provide the release version of terraform
     type: string
+    default: ""
   
   var-file:
     description: terraform variable file to include in plan
@@ -90,7 +95,6 @@ steps:
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-terraform >>
   - setup-packages:
-      working-directory: << parameters.working-directory >>
       terraform-version: << parameters.terraform-version >>
   - run:
       name: terraform init
