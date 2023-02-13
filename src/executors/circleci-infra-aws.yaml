@@ -5,7 +5,7 @@ description: |
   You can override to use your own executor keeping in mind you will need sudo and curl on
   the image to successfully install terraform. See the setup-packages command for details.
   
-  See https://github.com/ThoughtWorks-DPS/circleci-infra-builder
+  See https://github.com/ThoughtWorks-DPS/circleci-aws-infra
 
 parameters:
   executor-image:
