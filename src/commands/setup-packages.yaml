@@ -14,11 +14,6 @@ parameters:
     type: string
     default: ""
 
-  use-sudo:
-    description: whether to perform the install with sudo, default is true
-    type: boolean 
-    default: true
-
 steps:
   - when:
       condition: << parameters.terraform-version >>
