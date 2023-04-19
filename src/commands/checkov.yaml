@@ -1,7 +1,7 @@
 # src/commands/checkov.yaml
 
 description: |
-  Run checkov against terraform plan output json.
+  Basic checkov against terraform plan output json.
 
 parameters:
 

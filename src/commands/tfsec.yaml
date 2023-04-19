@@ -1,0 +1,23 @@
+# src/commands/tfsec.yaml
+
+description: |
+  Run tfsec against current working directory.
+
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+
+  tfsec-additional-args:
+    description: optional override of default directory and flags
+    type: string
+    default: "."
+      
+steps:
+  - run:
+      name: Run tfsec with optional override
+      working_directory: << parameters.working-directory >>
+      command: tfsec << parameters.tfsec-additional-args >>
+

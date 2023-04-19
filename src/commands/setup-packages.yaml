@@ -1,20 +1,25 @@
 # src/commands/setup-packages.yaml
 
 description: >
-  Install specified package versions on executor-builder executor. Keep in mind
-  that the install will use sudo since it assumes the executor-builder container
-  is running as a defined USER.
+  Install specified package versions on executor. Keep in mind that the install
+  will use sudo since it assumes the executor container is expected to
+  running as a defined USER.
 
 
 parameters:
 
   terraform-version:
-    description: must provide the release version of terraform
+    description: optional override to a specific release version of terraform
+    type: string
+    default: ""
+
+  checkov-version:
+    description: optional override to a specific release version of checkov
     type: string
     default: ""
 
   tfsec-version:
-    description: optional override to a specific release version of checkov
+    description: optional override to a specific release version of tfsec
     type: string
     default: ""
 
@@ -23,14 +28,23 @@ steps:
       condition: << parameters.terraform-version >>
       steps:
         - run:
-            name: install terraform
+            name: install terraform version << parameters.terraform-version >>
             command: |
               curl -SLO "https://releases.hashicorp.com/terraform/<< parameters.terraform-version >>/terraform_<< parameters.terraform-version >>_linux_amd64.zip"
               sudo unzip -o "terraform_<< parameters.terraform-version >>_linux_amd64.zip" -d /usr/local/bin
   - when:
+      condition: << parameters.checkov-version >>
+      steps:
+        - run:
+            name: install checkov version << parameters.checkov-version >>
+            command: sudo pip install --no-cache-dir --break-system-packages checkov==<< parameters.checkov-version >>
+  - when:
       condition:  << parameters.tfsec-version >>
       steps:
         - run:
-            name: install tfsec
+            name: install tfsec version << parameters.tfsec-version >>
             command: |
-              TFSEC_VERSION=<< parameters.checkov-version >> curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+              curl -SLO https://github.com/aquasecurity/tfsec/releases/download/v<< parameters.tfsec-version >>/tfsec-checkgen-linux-amd64
+              chmod +x tfsec-checkgen-linux-amd64
+              sudo mv tfsec-checkgen-linux-amd64 /usr/local/bin/tfsec
+

@@ -6,11 +6,12 @@ description: >
   Includes the following optional customizations:
 
   - set desired terraform version. Default is the version installed on the executor.
-  - reference your own docker image executor. Default is ghcr.io/thoughtworks-dps/twdps/circleci-infra-aws
+  - reference your own docker image executor. Default is twdps/circleci-infra-aws
   - set an executor resource-class, default is medium
   - set the executor shell process launch configuration, default is '/bin/sh -eo pipefail'
   - set a desired version and provider for tflint, default is latest and aws
-  - set a desired checkov version and whether or not to perform this scan, default is latest and true
+  - set whether to perform checkov scan of plan output file and optionally specify release version to use
+  - set whether to perform tfsec scan and optionally specify release version to use and additional flags
   - specify a working-directory, default is .
   - select a terraform workspace, default is none
   - turn off terraform fmt and validate checks
@@ -80,6 +81,21 @@ parameters:
     type: boolean
     default: true
 
+  tfsec-scan:
+    description: perform tfsec scan of terraform files
+    type: boolean
+    default: true
+
+  tfsec-additional-args:
+    description: optional override of default tfsec parameters
+    type: string
+    default: "."
+
+  tfsec-version:
+    description: optional override to a specific release version of tfsec
+    type: string
+    default: latest
+
   validate-terraform-fmt:
     description: perform terraform fmt and validate
     type: boolean
@@ -126,7 +142,8 @@ steps:
   - setup-packages:
       terraform-version: << parameters.terraform-version >>
       checkov-version: << parameters.checkov-version >>
-  - lint:
+      tfsec-version: << parameters.tfsec-version >>
+  - tflint:
       working-directory: << parameters.working-directory >>
       tflint-version: << parameters.tflint-version >>
       tflint-provider: << parameters.tflint-provider >>
@@ -136,6 +153,13 @@ steps:
       command: |
         terraform version
         terraform init <<#parameters.backend-conf>> << parameters.backend-conf >> <</parameters.backend-conf>>
+  - when:
+      name: perform tfsec scan of terraform files
+      condition: << parameters.tfsec-scan >>
+      steps:
+        - tfsec:
+            working-directory: << parameters.working-directory >>
+            tfsec-additional-args: << parameters.tfsec-additional-args >>
   - when:
       name: perform terraform fmt and validate
       condition: << parameters.validate-terraform-fmt >>

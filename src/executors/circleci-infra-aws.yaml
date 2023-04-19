@@ -1,7 +1,7 @@
-# src/executors/circleci-base-image.yaml
+# src/executors/circleci-infra-aws.yaml
 
 description: |
-  By default the orb will use twdps/circleci-infra-aws as the executor image. 
+  By default the orb will use twdps/circleci-infra-aws:stable as the executor image. 
   You can override to use your own executor keeping in mind you will need sudo and curl on
   the image to successfully install terraform. See the setup-packages command for details.
   
@@ -11,6 +11,7 @@ parameters:
   executor-image:
     description: available override
     type: string
+    default: twdps/circleci-infra-aws:stable
 
   resource-class:
     type: enum
@@ -21,3 +22,4 @@ resource_class: << parameters.resource-class >>
 
 docker:
   - image: << parameters.executor-image >>
+
