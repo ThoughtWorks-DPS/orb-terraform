@@ -2,7 +2,7 @@
 version: 2.1
 
 description: |
-  Standard terraform pipeline jobs.
+  Standardized terraform pipeline jobs.
 
 display:
   source_url: "https://github.com/ThoughtWorks-DPS/orb-terraform"

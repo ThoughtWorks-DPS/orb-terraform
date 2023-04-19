@@ -1,16 +1,20 @@
 # src/commands/setup-packages.yaml
 
 description: >
-  Install specified terraform version on executor.
-  
-  requirements:
-  - curl
-  - sudo. Keep in mind that the install will use sudo since it assumes the container is running as a defined USER.
+  Install specified package versions on executor-builder executor. Keep in mind
+  that the install will use sudo since it assumes the executor-builder container
+  is running as a defined USER.
+
 
 parameters:
 
   terraform-version:
     description: must provide the release version of terraform
+    type: string
+    default: ""
+
+  tfsec-version:
+    description: optional override to a specific release version of checkov
     type: string
     default: ""
 
@@ -23,4 +27,10 @@ steps:
             command: |
               curl -SLO "https://releases.hashicorp.com/terraform/<< parameters.terraform-version >>/terraform_<< parameters.terraform-version >>_linux_amd64.zip"
               sudo unzip -o "terraform_<< parameters.terraform-version >>_linux_amd64.zip" -d /usr/local/bin
-
+  - when:
+      condition:  << parameters.tfsec-version >>
+      steps:
+        - run:
+            name: install tfsec
+            command: |
+              TFSEC_VERSION=<< parameters.checkov-version >> curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash

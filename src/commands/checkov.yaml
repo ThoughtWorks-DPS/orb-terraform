@@ -1,0 +1,21 @@
+# src/commands/checkov.yaml
+
+description: |
+  Run checkov against terraform plan output json.
+
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+
+steps:
+  - run:
+      name: Generate json formatted version of plan output file
+      working_directory: << parameters.working-directory >>
+      command: terraform show -json tfplan.binary | jq '.' > tfplan.json
+  - run:
+      name: Run checkov against terraform plan output json
+      working_directory: << parameters.working-directory >>
+      command: checkov -f tfplan.json

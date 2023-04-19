@@ -6,10 +6,11 @@ description: >
   Includes the following optional customizations:
 
   - set desired terraform version. Default is the version installed on the executor.
-  - reference your own docker image executor. Default is twdps/circleci-infra-aws
+  - reference your own docker image executor. Default is ghcr.io/thoughtworks-dps/twdps/circleci-infra-aws
   - set an executor resource-class, default is medium
   - set the executor shell process launch configuration, default is '/bin/sh -eo pipefail'
   - set a desired version and provider for tflint, default is latest and aws
+  - set a desired checkov version and whether or not to perform this scan, default is latest and true
   - specify a working-directory, default is .
   - select a terraform workspace, default is none
   - turn off terraform fmt and validate checks
@@ -41,7 +42,7 @@ parameters:
   executor-image:
     description: available override
     type: string
-    default: docker.io/twdps/circleci-infra-aws:alpine-stable
+    default: ghcr.io/thoughtworks-dps/twdps/circleci-infra-aws:alpine-stable
 
   resource-class:
     type: enum
@@ -68,6 +69,16 @@ parameters:
     type: enum
     enum: ["aws", "azurerm", "google"]
     default: aws
+
+  checkov-version:
+    description: optional override to a specific release version of checkov
+    type: string
+    default: ""
+
+  checkov-scan:
+    description: perform checkov scan of terraform plan output
+    type: boolean
+    default: true
 
   validate-terraform-fmt:
     description: perform terraform fmt and validate
@@ -114,6 +125,7 @@ steps:
       steps: << parameters.before-terraform >>
   - setup-packages:
       terraform-version: << parameters.terraform-version >>
+      checkov-version: << parameters.checkov-version >>
   - lint:
       working-directory: << parameters.working-directory >>
       tflint-version: << parameters.tflint-version >>
@@ -138,7 +150,13 @@ steps:
   - run:
       name: terraform plan
       working_directory: << parameters.working-directory >>
-      command: terraform plan <<#parameters.var-file>> -var-file=<< parameters.var-file >> <</parameters.var-file>> <<#parameters.extra-terraform-args>> << parameters.extra-terraform-args >> <</parameters.extra-terraform-args>>
+      command: terraform plan <<#parameters.var-file>> -var-file=<< parameters.var-file >> <</parameters.var-file>> <<#parameters.extra-terraform-args>> << parameters.extra-terraform-args >> <</parameters.extra-terraform-args>> --out tfplan.binary
+  - when:
+      name: run checkov inspection of terraform plan output
+      condition: << parameters.checkov-scan >>
+      steps:
+        - checkov:
+            working-directory: << parameters.working-directory >>
   - when:
       name: Run after-terraform lifecycle hook steps
       condition: << parameters.after-terraform >>
