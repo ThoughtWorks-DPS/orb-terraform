@@ -43,7 +43,7 @@ parameters:
   executor-image:
     description: available override
     type: string
-    default: ghcr.io/thoughtworks-dps/twdps/circleci-infra-aws:alpine-stable
+    default: docker.io/twdps/circleci-infra-aws:alpine-stable
 
   resource-class:
     type: enum

@@ -18,3 +18,4 @@ steps:
       name: validate terraform files
       working_directory: << parameters.working-directory >>
       command: terraform validate
+
