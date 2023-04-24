@@ -94,7 +94,7 @@ parameters:
   tfsec-version:
     description: optional override to a specific release version of tfsec
     type: string
-    default: latest
+    default: ""
 
   validate-terraform-fmt:
     description: perform terraform fmt and validate
