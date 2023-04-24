@@ -89,7 +89,7 @@ parameters:
   tfsec-additional-args:
     description: optional override of default tfsec parameters
     type: string
-    default: "."
+    default: ""
 
   tfsec-version:
     description: optional override to a specific release version of tfsec
