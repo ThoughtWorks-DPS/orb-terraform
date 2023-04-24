@@ -13,7 +13,7 @@ parameters:
   tfsec-additional-args:
     description: optional override of default directory and flags
     type: string
-    default: "."
+    default: ""
       
 steps:
   - run:
