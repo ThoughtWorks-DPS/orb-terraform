@@ -23,6 +23,11 @@ parameters:
     type: string
     default: ""
 
+  driftctl-version:
+    description: optional override to a specific release version of driftctl
+    type: string
+    default: ""
+
 steps:
   - when:
       condition: << parameters.terraform-version >>
@@ -47,4 +52,13 @@ steps:
               curl -SLO https://github.com/aquasecurity/tfsec/releases/download/v<< parameters.tfsec-version >>/tfsec-checkgen-linux-amd64
               chmod +x tfsec-checkgen-linux-amd64
               sudo mv tfsec-checkgen-linux-amd64 /usr/local/bin/tfsec
+  - when:
+      condition:  << parameters.driftctl-version >>
+      steps:
+        - run:
+            name: install driftctl version << parameters.driftctl-version >>
+            command: |
+              curl -L https://github.com/snyk/driftctl/releases/download/v<< parameters.driftctl-version >>/driftctl_linux_amd64 -o driftctl
+              chmod +x driftctl
+              sudo mv driftctl /usr/local/bin/driftctl
 
