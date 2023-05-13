@@ -10,7 +10,7 @@ description: >
   - set an executor resource-class, default is medium
   - set the executor shell process launch configuration, default is '/bin/sh -eo pipefail'
   - set a desired version and provider for tflint, default is latest and aws
-  - set whether to perform checkov scan of plan output file and optionally specify release version to use
+  - set whether to perform checkov scan of plan output file and optionally specify release version to use and additional flags
   - set whether to perform tfsec scan and optionally specify release version to use and additional flags
   - specify a working-directory, default is .
   - select a terraform workspace, default is none
@@ -59,7 +59,7 @@ parameters:
     description: must provide the release version of terraform
     type: string
     default: ""
-  
+
   tflint-version:
     description: optional override to a specific release version of tflint
     type: string
@@ -80,6 +80,11 @@ parameters:
     description: perform checkov scan of terraform plan output
     type: boolean
     default: true
+
+  checkov-additional-args:
+    description: optional additional flags to be passed to checkov
+    type: string
+    default: ""
 
   tfsec-scan:
     description: perform tfsec scan of terraform files
@@ -105,7 +110,7 @@ parameters:
     description: terraform variable file to include in plan
     type: string
     default: ""
-  
+
   extra-terraform-args:
     description: additional command line arguements for terraform plan
     type: string
@@ -181,6 +186,7 @@ steps:
       steps:
         - checkov:
             working-directory: << parameters.working-directory >>
+            checkov-additional-args: << parameters.checkov-additional-args >>
   - when:
       name: Run after-terraform lifecycle hook steps
       condition: << parameters.after-terraform >>

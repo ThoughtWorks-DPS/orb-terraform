@@ -9,6 +9,10 @@ parameters:
     description: specific folder in which to run the commands
     type: string
     default: '.'
+  checkov-additional-args:
+    description: optional additional flags to be passed to checkov
+    type: string
+    default: ""
 
 steps:
   - run:
@@ -16,6 +20,6 @@ steps:
       working_directory: << parameters.working-directory >>
       command: terraform show -json tfplan.binary | jq '.' > tfplan.json
   - run:
-      name: Run checkov against terraform plan output json
+      name: Run checkov against terraform plan output json with optional additional args
       working_directory: << parameters.working-directory >>
-      command: checkov -f tfplan.json
+      command: checkov -f tfplan.json << parameters.checkov-additional-args >>
