@@ -23,6 +23,8 @@ executor:
   name: circleci-infra-aws
   executor-image: << parameters.executor-image >>
   resource-class: << parameters.resource-class >>
+  username: << parameters.executor-registry-username >>
+  password: << parameters.executor-registry-password >>
 
 environment:
   TF_WORKSPACE: << parameters.workspace >>
@@ -44,6 +46,16 @@ parameters:
     description: available override
     type: string
     default: docker.io/twdps/circleci-infra-aws:alpine-stable
+
+  executor-registry-username:
+    description: Environment variable to reference as username for the registry specified by executor-image parameter
+    type: env_var_name
+    default: DOCKER_LOGIN
+
+  executor-registry-password:
+    description: Environment variable to reference as password for the registry specified by executor-image parameter
+    type: env_var_name
+    default: DOCKER_PASSWORD
 
   resource-class:
     type: enum

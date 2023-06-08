@@ -18,8 +18,21 @@ parameters:
     enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
     default: medium
 
+  username:
+    description: username for executor registry authentication
+    type: env_var_name
+    default: DOCKER_LOGIN
+
+  password:
+    description: password for executor registry authentication
+    type: env_var_name
+    default: DOCKER_PASSWORD
+
 resource_class: << parameters.resource-class >>
 
 docker:
   - image: << parameters.executor-image >>
+    auth:
+      username: ${<< parameters.username >>}
+      password: ${<< parameters.password >>}
 
