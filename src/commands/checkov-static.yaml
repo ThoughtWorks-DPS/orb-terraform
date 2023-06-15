@@ -1,0 +1,21 @@
+# src/commands/checkov.yaml
+
+description: |
+  Basic checkov static analysis.
+
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+  checkov-additional-args:
+    description: optional additional flags to be passed to checkov
+    type: string
+    default: ""
+
+steps:
+  - run:
+      name: Run checkov against the TF working directory with optional additional args
+      working_directory: << parameters.working-directory >>
+      command: checkov -d << parameters.working-directory >> << parameters.checkov-additional-args >>
