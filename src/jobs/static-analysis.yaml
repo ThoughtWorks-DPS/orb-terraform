@@ -65,6 +65,11 @@ parameters:
     type: boolean
     default: true
 
+  snyk-scan:
+    description: perform Snyk scan of source code
+    type: boolean
+    default: true
+
   checkov-additional-args:
     description: optional additional flags to be passed to checkov
     type: string
@@ -90,8 +95,8 @@ parameters:
     type: boolean
     default: true
 
-  backend-conf:
-    description: additional terraform init parameters to configure backend.conf if necessary
+  snyk-organization:
+    description: the Snyk organization to reference
     type: string
     default: ""
 
@@ -134,6 +139,13 @@ steps:
         - checkov:
             working-directory: << parameters.working-directory >>
             checkov-additional-args: << parameters.checkov-additional-args >>
+  - when:
+      name: run Snyk IaC inspection of TF source files
+      condition: << parameters.snyk-scan >>
+      steps:
+        - snyk:
+            working-directory: << parameters.working-directory >>
+            organization: << parameters.snyk-organization >>
   - when:
       name: perform terraform fmt and validate
       condition: << parameters.validate-terraform-fmt >>
