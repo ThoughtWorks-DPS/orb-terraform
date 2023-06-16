@@ -49,6 +49,12 @@ parameters:
     type: string
     default: 'latest'
 
+  lint-terraform:
+    description: |
+      perform tflint of terraform files.
+    type: boolean
+    default: true
+
   tflint-provider:
     description: provider for tflint plugin
     type: enum
@@ -132,10 +138,14 @@ steps:
       snyk-version: << parameters.snyk-version >>
       checkov-version: << parameters.checkov-version >>
       tfsec-version: << parameters.tfsec-version >>
-  - tflint:
-      working-directory: << parameters.working-directory >>
-      tflint-version: << parameters.tflint-version >>
-      tflint-provider: << parameters.tflint-provider >>
+  - when:
+      name: run tflint
+      condition: parameters.lint-terraform >>
+      steps:
+        - tflint:
+            working-directory: << parameters.working-directory >>
+            tflint-version: << parameters.tflint-version >>
+            tflint-provider: << parameters.tflint-provider >>
   - run:
       name: terraform init
       working_directory: << parameters.working-directory >>
