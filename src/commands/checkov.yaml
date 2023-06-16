@@ -16,10 +16,6 @@ parameters:
 
 steps:
   - run:
-      name: Generate json formatted version of plan output file
-      working_directory: << parameters.working-directory >>
-      command: terraform show -json tfplan.binary | jq '.' > tfplan.json
-  - run:
       name: Run checkov against terraform plan output json with optional additional args
       working_directory: << parameters.working-directory >>
       command: checkov -f tfplan.json << parameters.checkov-additional-args >>

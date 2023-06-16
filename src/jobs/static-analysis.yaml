@@ -71,6 +71,11 @@ parameters:
     type: boolean
     default: true
 
+  checkov-additional-args:
+    description: optional additional flags to be passed to checkov
+    type: string
+    default: ""
+
   snyk-version:
     description: optional override to a specific release version of snyk
     type: string
@@ -80,11 +85,6 @@ parameters:
     description: perform Snyk scan of source code
     type: boolean
     default: true
-
-  checkov-additional-args:
-    description: optional additional flags to be passed to checkov
-    type: string
-    default: ""
 
   tfsec-scan:
     description: perform tfsec scan of terraform source files
@@ -170,7 +170,7 @@ steps:
       name: run Snyk IaC inspection of TF source files
       condition: << parameters.snyk-scan >>
       steps:
-        - snyk:
+        - snyk-static:
             working-directory: << parameters.working-directory >>
             organization: << parameters.snyk-organization >>
   - when:

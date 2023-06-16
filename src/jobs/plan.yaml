@@ -105,6 +105,21 @@ parameters:
     type: string
     default: ""
 
+  snyk-version:
+    description: optional override to a specific release version of snyk
+    type: string
+    default: ""
+
+  snyk-scan:
+    description: perform Snyk scan of source code
+    type: boolean
+    default: false
+
+  snyk-organization:
+    description: the Snyk organization to reference
+    type: string
+    default: ""
+
   tfsec-scan:
     description: |
       perform tfsec scan of terraform files. Both this parameter and `static-analysis` must be set to `true` for tfscan to occur
@@ -173,6 +188,7 @@ steps:
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-terraform >>
   - setup-packages:
+      snyk-version: << parameters.snyk-version >>
       terraform-version: << parameters.terraform-version >>
       checkov-version: << parameters.checkov-version >>
       tfsec-version: << parameters.tfsec-version >>
@@ -222,6 +238,19 @@ steps:
       working_directory: << parameters.working-directory >>
       command: terraform plan <<#parameters.var-file>> -var-file=<< parameters.var-file >> <</parameters.var-file>> <<#parameters.extra-terraform-args>> << parameters.extra-terraform-args >> <</parameters.extra-terraform-args>> --out tfplan.binary
   - when:
+      name: generate terraform plan as json for security tools
+      condition:
+        or:
+          - and:
+            - << parameters.static-analysis >>
+            - << parameters.checkov-scan >>
+          - and:
+            - << parameters.static-analysis >>
+            - << parameters.snyk-scan >>
+      steps:
+        - generate-terraform-json:
+            working-directory: << parameters.working-directory >>
+  - when:
       name: run checkov inspection of terraform plan output
       condition:
         and:
@@ -231,6 +260,16 @@ steps:
         - checkov:
             working-directory: << parameters.working-directory >>
             checkov-additional-args: << parameters.checkov-additional-args >>
+  - when:
+      name: run snyk inspection of terraform plan output
+      condition:
+        and:
+          - << parameters.static-analysis >>
+          - << parameters.snyk-scan >>
+      steps:
+        - snyk:
+            working-directory: << parameters.working-directory >>
+            organization: << parameters.snyk-organization >>
   - when:
       name: Run after-terraform lifecycle hook steps
       condition: << parameters.after-terraform >>
