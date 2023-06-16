@@ -84,7 +84,8 @@ parameters:
     default: aws
 
   lint-terraform:
-    description: perform tflint of terraform files
+    description: |
+      perform tflint of terraform files. Both this parameter and `static-analysis` must be set to `true` for linting to occur
     type: boolean
     default: true
 
@@ -94,7 +95,8 @@ parameters:
     default: ""
 
   checkov-scan:
-    description: perform checkov scan of terraform plan output
+    description: |
+      perform checkov scan of terraform plan. Both this parameter and `static-analysis` must be set to `true` for checkov to run
     type: boolean
     default: true
 
@@ -104,7 +106,8 @@ parameters:
     default: ""
 
   tfsec-scan:
-    description: perform tfsec scan of terraform files
+    description: |
+      perform tfsec scan of terraform files. Both this parameter and `static-analysis` must be set to `true` for tfscan to occur
     type: boolean
     default: true
 
@@ -119,7 +122,8 @@ parameters:
     default: ""
 
   validate-terraform-fmt:
-    description: perform terraform fmt and validate
+    description: |
+      perform terraform fmt and validate. Both this parameter and `static-analysis` must be set to `true` for validation to occur
     type: boolean
     default: true
 
@@ -155,8 +159,8 @@ parameters:
 
   static-analysis:
     description: |
-      Run all static steps. When set to false, prevents all analysis tasks from running (tflint, tfsec, tf fmt,
-      tf validate). You may be interested in the separate `static-analysis` job for performing these tasks.
+      Run all static steps. When set to false, prevents all static analysis tasks from running (tflint, checkov, tfsec, tf fmt, tf validate).
+      You may be interested in the separate `static-analysis` job for performing these tasks.
     type: boolean
     default: true
 
