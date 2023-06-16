@@ -140,7 +140,7 @@ steps:
       tfsec-version: << parameters.tfsec-version >>
   - when:
       name: run tflint
-      condition: parameters.lint-terraform >>
+      condition: << parameters.lint-terraform >>
       steps:
         - tflint:
             working-directory: << parameters.working-directory >>
