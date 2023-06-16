@@ -65,6 +65,11 @@ parameters:
     type: boolean
     default: true
 
+  snyk-version:
+    description: optional override to a specific release version of snyk
+    type: string
+    default: ""
+
   snyk-scan:
     description: perform Snyk scan of source code
     type: boolean
@@ -119,6 +124,7 @@ steps:
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-static-analysis >>
   - setup-packages:
+      snyk-version: << parameters.snyk-version >>
       checkov-version: << parameters.checkov-version >>
       tfsec-version: << parameters.tfsec-version >>
   - tflint:
