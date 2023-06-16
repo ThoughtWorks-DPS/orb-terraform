@@ -1,4 +1,4 @@
-# src/commands/checkov.yaml
+# src/commands/checkov-static.yaml
 
 description: |
   Basic checkov static analysis.
