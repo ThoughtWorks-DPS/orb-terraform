@@ -23,6 +23,11 @@ parameters:
     type: string
     default: ""
 
+  snyk-version:
+    description: optional override to a specific release version of snyk
+    type: string
+    default: ""
+
 steps:
   - when:
       condition: << parameters.terraform-version >>
@@ -47,3 +52,16 @@ steps:
               curl -SLO https://github.com/aquasecurity/tfsec/releases/download/v<< parameters.tfsec-version >>/tfsec-checkgen-linux-amd64
               chmod +x tfsec-checkgen-linux-amd64
               sudo mv tfsec-checkgen-linux-amd64 /usr/local/bin/tfsec
+  - when:
+      condition: << parameters.snyk-version >>
+      steps:
+        - run:
+            name: install snyk version << parameters.snyk-version >>
+            command: |
+              SNYK_SIGNING_KEY=A22665FB96CAB0E0973604C83676C4B8289C296E
+              SNYK_PACKAGE_NAME=$(cat /etc/os-release | grep -q alpine && echo "snyk-alpine" || echo "snyk-linux")
+              gpg --keyserver hkps://keys.openpgp.org --recv-keys "${SNYK_SIGNING_KEY}"
+              curl -sSLO "https://static.snyk.io/cli/v<< parameters.snyk-version >>/${SNYK_PACKAGE_NAME}" && \
+              curl -sSLO "https://static.snyk.io/cli/v<< parameters.snyk-version >>/sha256sums.txt.asc" && \
+              gpg --verify sha256sums.txt.asc && grep "${SNYK_PACKAGE_NAME}\$" sha256sums.txt.asc | sha256sum -c - && sudo rm sha256sums.txt.asc && \
+              chmod +x "${SNYK_PACKAGE_NAME}" && sudo mv "${SNYK_PACKAGE_NAME}" /usr/local/bin/snyk
