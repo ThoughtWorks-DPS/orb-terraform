@@ -141,7 +141,7 @@ steps:
       working_directory: << parameters.working-directory >>
       command: |
         terraform version
-        terraform init <<#parameters.backend-conf>> << parameters.backend-conf >> <</parameters.backend-conf>>
+        terraform init -backend=false <<#parameters.backend-conf>> << parameters.backend-conf >> <</parameters.backend-conf>>
   - when:
       name: perform tfsec scan of terraform source files
       condition: << parameters.tfsec-scan >>
