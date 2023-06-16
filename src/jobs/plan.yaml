@@ -83,6 +83,11 @@ parameters:
     enum: ["aws", "azurerm", "google"]
     default: aws
 
+  lint-terraform:
+    description: perform tflint of terraform files
+    type: boolean
+    default: true
+
   checkov-version:
     description: optional override to a specific release version of checkov
     type: string
@@ -160,10 +165,14 @@ steps:
       terraform-version: << parameters.terraform-version >>
       checkov-version: << parameters.checkov-version >>
       tfsec-version: << parameters.tfsec-version >>
-  - tflint:
-      working-directory: << parameters.working-directory >>
-      tflint-version: << parameters.tflint-version >>
-      tflint-provider: << parameters.tflint-provider >>
+  - when:
+      name: run tflint
+      condition: << parameters.lint-terraform >>
+      steps:
+      - tflint:
+          working-directory: << parameters.working-directory >>
+          tflint-version: << parameters.tflint-version >>
+          tflint-provider: << parameters.tflint-provider >>
   - run:
       name: terraform init
       working_directory: << parameters.working-directory >>
