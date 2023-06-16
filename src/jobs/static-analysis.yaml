@@ -1,0 +1,147 @@
+# /src/jobs/static-analysis.yaml
+
+description: >
+  Run static analysis and linting tools (tfsec, tflint, checkov, snyk-iac)
+
+executor:
+  name: circleci-infra-aws
+  executor-image: << parameters.executor-image >>
+  resource-class: << parameters.resource-class >>
+  username: << parameters.executor-registry-username >>
+  password: << parameters.executor-registry-password >>
+
+shell: << parameters.shell >>
+
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+
+  executor-image:
+    description: available override
+    type: string
+    default: docker.io/twdps/circleci-infra-aws:alpine-stable
+
+  executor-registry-username:
+    description: Environment variable to reference as username for the registry specified by executor-image parameter
+    type: env_var_name
+    default: DOCKER_LOGIN
+
+  executor-registry-password:
+    description: Environment variable to reference as password for the registry specified by executor-image parameter
+    type: env_var_name
+    default: DOCKER_PASSWORD
+
+  resource-class:
+    type: enum
+    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    default: medium
+
+  shell:
+    description: default shell invocation. Override to support different shells or tools like secrethub.io
+    type: string
+    default: /bin/sh -eo pipefail
+
+  tflint-version:
+    description: optional override to a specific release version of tflint
+    type: string
+    default: 'latest'
+
+  tflint-provider:
+    description: provider for tflint plugin
+    type: enum
+    enum: ["aws", "azurerm", "google"]
+    default: aws
+
+  checkov-version:
+    description: optional override to a specific release version of checkov
+    type: string
+    default: ""
+
+  checkov-scan:
+    description: perform checkov scan of source code
+    type: boolean
+    default: true
+
+  checkov-additional-args:
+    description: optional additional flags to be passed to checkov
+    type: string
+    default: ""
+
+  tfsec-scan:
+    description: perform tfsec scan of terraform source files
+    type: boolean
+    default: true
+
+  tfsec-additional-args:
+    description: optional override of default tfsec parameters
+    type: string
+    default: ""
+
+  tfsec-version:
+    description: optional override to a specific release version of tfsec
+    type: string
+    default: ""
+
+  validate-terraform-fmt:
+    description: perform terraform fmt and validate
+    type: boolean
+    default: true
+
+  backend-conf:
+    description: additional terraform init parameters to configure backend.conf if necessary
+    type: string
+    default: ""
+
+  before-static-analysis:
+    description: Optional steps to run before running static analysis
+    type: steps
+    default: []
+
+  after-static-analysis:
+    description: Optional steps to run after running static analysis
+    type: steps
+    default: []
+
+steps:
+  - checkout
+  - setup_remote_docker
+  - when:
+      name: Run before-static-analysis lifecycle hook steps
+      condition: << parameters.before-static-analysis >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.before-static-analysis >>
+  - setup-packages:
+      checkov-version: << parameters.checkov-version >>
+      tfsec-version: << parameters.tfsec-version >>
+  - tflint:
+      working-directory: << parameters.working-directory >>
+      tflint-version: << parameters.tflint-version >>
+      tflint-provider: << parameters.tflint-provider >>
+  - when:
+      name: perform tfsec scan of terraform source files
+      condition: << parameters.tfsec-scan >>
+      steps:
+        - tfsec:
+            working-directory: << parameters.working-directory >>
+            tfsec-additional-args: << parameters.tfsec-additional-args >>
+  - when:
+      name: run checkov inspection of terraform source files
+      condition: << parameters.checkov-scan >>
+      steps:
+        - checkov:
+            working-directory: << parameters.working-directory >>
+            checkov-additional-args: << parameters.checkov-additional-args >>
+  - when:
+      name: perform terraform fmt and validate
+      condition: << parameters.validate-terraform-fmt >>
+      steps:
+        - validate:
+            working-directory: << parameters.working-directory >>
+  - when:
+      name: Run after-static-analysis lifecycle hook steps
+      condition: << parameters.after-static-analysis >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.after-static-analysis >>
