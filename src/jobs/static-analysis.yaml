@@ -105,6 +105,11 @@ parameters:
     type: string
     default: ""
 
+  backend-conf:
+    description: additional terraform init parameters to configure backend.conf if necessary
+    type: string
+    default: ""
+
   before-static-analysis:
     description: Optional steps to run before running static analysis
     type: steps
@@ -131,6 +136,12 @@ steps:
       working-directory: << parameters.working-directory >>
       tflint-version: << parameters.tflint-version >>
       tflint-provider: << parameters.tflint-provider >>
+  - run:
+      name: terraform init
+      working_directory: << parameters.working-directory >>
+      command: |
+        terraform version
+        terraform init <<#parameters.backend-conf>> << parameters.backend-conf >> <</parameters.backend-conf>>
   - when:
       name: perform tfsec scan of terraform source files
       condition: << parameters.tfsec-scan >>
