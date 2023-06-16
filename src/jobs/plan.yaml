@@ -59,7 +59,7 @@ parameters:
 
   resource-class:
     type: enum
-    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    enum: [ small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+ ]
     default: medium
 
   shell:
@@ -80,7 +80,7 @@ parameters:
   tflint-provider:
     description: provider for tflint plugin
     type: enum
-    enum: ["aws", "azurerm", "google"]
+    enum: [ "aws", "azurerm", "google" ]
     default: aws
 
   lint-terraform:
@@ -141,17 +141,24 @@ parameters:
   before-terraform:
     description: Optional steps to run before running terraform
     type: steps
-    default: []
+    default: [ ]
 
   after-terraform-init:
     description: Optional steps to run after terraform init but before running terraform plan
     type: steps
-    default: []
+    default: [ ]
 
   after-terraform:
     description: Optional steps to run after running terraform plan
     type: steps
-    default: []
+    default: [ ]
+
+  static-analysis:
+    description: |
+      Run all static steps. When set to false, prevents all analysis tasks from running (tflint, tfsec, tf fmt,
+      tf validate). You may be interested in the separate `static-analysis` job for performing these tasks.
+    type: boolean
+    default: true
 
 steps:
   - checkout
@@ -167,12 +174,15 @@ steps:
       tfsec-version: << parameters.tfsec-version >>
   - when:
       name: run tflint
-      condition: << parameters.lint-terraform >>
+      condition:
+        and:
+         - << parameters.static-analysis >>
+         - << parameters.lint-terraform >>
       steps:
-      - tflint:
-          working-directory: << parameters.working-directory >>
-          tflint-version: << parameters.tflint-version >>
-          tflint-provider: << parameters.tflint-provider >>
+        - tflint:
+            working-directory: << parameters.working-directory >>
+            tflint-version: << parameters.tflint-version >>
+            tflint-provider: << parameters.tflint-provider >>
   - run:
       name: terraform init
       working_directory: << parameters.working-directory >>
@@ -181,14 +191,20 @@ steps:
         terraform init <<#parameters.backend-conf>> << parameters.backend-conf >> <</parameters.backend-conf>>
   - when:
       name: perform tfsec scan of terraform files
-      condition: << parameters.tfsec-scan >>
+      condition:
+        and:
+          - << parameters.static-analysis >>
+          - << parameters.tfsec-scan >>
       steps:
         - tfsec:
             working-directory: << parameters.working-directory >>
             tfsec-additional-args: << parameters.tfsec-additional-args >>
   - when:
-      name: perform terraform fmt and validate
-      condition: << parameters.validate-terraform-fmt >>
+      name: run terraform validate
+      condition:
+        and:
+          - << parameters.static-analysis >>
+          - << parameters.validate-terraform-fmt >>
       steps:
         - validate:
             working-directory: << parameters.working-directory >>
@@ -203,7 +219,10 @@ steps:
       command: terraform plan <<#parameters.var-file>> -var-file=<< parameters.var-file >> <</parameters.var-file>> <<#parameters.extra-terraform-args>> << parameters.extra-terraform-args >> <</parameters.extra-terraform-args>> --out tfplan.binary
   - when:
       name: run checkov inspection of terraform plan output
-      condition: << parameters.checkov-scan >>
+      condition:
+        and:
+          - << parameters.static-analysis >>
+          - << parameters.checkov-scan >>
       steps:
         - checkov:
             working-directory: << parameters.working-directory >>
