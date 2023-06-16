@@ -136,7 +136,7 @@ steps:
       name: run checkov inspection of terraform source files
       condition: << parameters.checkov-scan >>
       steps:
-        - checkov:
+        - checkov-static:
             working-directory: << parameters.working-directory >>
             checkov-additional-args: << parameters.checkov-additional-args >>
   - when:
