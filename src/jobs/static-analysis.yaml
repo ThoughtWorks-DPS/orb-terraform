@@ -165,13 +165,6 @@ steps:
             working-directory: << parameters.working-directory >>
             tfsec-additional-args: << parameters.tfsec-additional-args >>
   - when:
-      name: run checkov inspection of terraform source files
-      condition: << parameters.checkov-scan >>
-      steps:
-        - checkov-static:
-            working-directory: << parameters.working-directory >>
-            checkov-additional-args: << parameters.checkov-additional-args >>
-  - when:
       name: run Snyk IaC inspection of TF source files
       condition: << parameters.snyk-scan >>
       steps:
@@ -179,6 +172,13 @@ steps:
             working-directory: << parameters.working-directory >>
             organization: << parameters.snyk-organization >>
             snyk-additional-args: << parameters.snyk-additional-args >>
+  - when:
+      name: run checkov inspection of terraform source files
+      condition: << parameters.checkov-scan >>
+      steps:
+        - checkov-static:
+            working-directory: << parameters.working-directory >>
+            checkov-additional-args: << parameters.checkov-additional-args >>
   - when:
       name: perform terraform fmt and validate
       condition: << parameters.validate-terraform-fmt >>
