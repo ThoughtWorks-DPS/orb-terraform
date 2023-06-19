@@ -111,6 +111,11 @@ parameters:
     type: string
     default: ""
 
+  snyk-additional-args:
+    description: optional additional flags to be passed to Snyk IaC
+    type: string
+    default: ""
+
   backend-conf:
     description: additional terraform init parameters to configure backend.conf if necessary
     type: string
@@ -173,6 +178,7 @@ steps:
         - snyk-static:
             working-directory: << parameters.working-directory >>
             organization: << parameters.snyk-organization >>
+            snyk-additional-args: << parameters.snyk-additional-args >>
   - when:
       name: perform terraform fmt and validate
       condition: << parameters.validate-terraform-fmt >>
