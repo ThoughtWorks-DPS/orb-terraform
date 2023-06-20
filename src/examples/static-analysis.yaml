@@ -1,17 +1,22 @@
-# src/examples/standard-example.yaml
+# src/examples/static-analysis.yaml
 
-description: Standard usage of the twdps/terraform orb plan and apply jobs.
+description: >
+  Separate static analysis job prior to terraform plan using twdps/terraform orb.
+  Use this to run a single job that will run static analysis and security scanning prior to deployment.
+  Use the `static-analysis: false` flag to turn off individual static analysis during the plan jobs.
 
 usage:
   version: 2.1
 
   orbs:
-    terraform: twdps/terraform@0.1.0
+    terraform: twdps/terraform@0.12.0
 
+  # ==== global pipeline parameters
   globals:
     - &context my-team
     - &shell-options secrethub run -- /bin/sh -eo pipefail
     - &terraform-version 1.0.6
+    - &snyk-org my-snyk-org
 
   # ==== triggers
 
@@ -51,11 +56,24 @@ usage:
 
       jobs:
         # git push: deploy sandbox
+        - terraform/static-analysis:
+            name: static analysis
+            context: *context
+            shell: *shell-options
+            snyk-organization: *snyk-org
+            snyk-additional-args: --severity-threshold=high
+            before-static-analysis:
+              - run:
+                  name: setup snyk token
+                  command: echo "example of setting up secrets prior to static analysis"
+            filters: *on-push-main
+
         - terraform/plan:
             name: sandbox-change-plan
             context: *context
             shell: *shell-options
             workspace: sandbox
+            static-analysis: false
             terraform-version: *terraform-version
             before-terraform:
               - set-environment:
@@ -87,6 +105,7 @@ usage:
             context: *context
             shell: *shell-options
             workspace: preview
+            static-analysis: false
             terraform-version: *terraform-version
             before-terraform:
               - set-environment:
