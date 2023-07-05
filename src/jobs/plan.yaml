@@ -157,6 +157,26 @@ parameters:
     type: string
     default: ""
 
+  tfc-local-execution-mode:
+    description: Confirm or Create the associated tfc-workspace-name in local-execution-mode for tfc-organization.
+    type: boolean
+    default: false
+
+  tfc-organization:
+    description: name of terraform cloud organization
+    type: string
+    default: ""
+
+  tfc-workspace-name:
+    description: Used for workspace 'creation' workflow
+    type: string
+    default: ""
+
+  tfe-token:
+    description: terraform team-api token. Uses $TFE_TOKEN by default
+    type: string
+    default: $TFE_TOKEN
+
   before-terraform:
     description: Optional steps to run before running terraform
     type: steps
@@ -203,6 +223,14 @@ steps:
             working-directory: << parameters.working-directory >>
             tflint-version: << parameters.tflint-version >>
             tflint-provider: << parameters.tflint-provider >>
+  - when:
+      name: Confirm or Create tfcloud workspace in local-execute-mode
+      condition: << parameters.tfc-local-execution-mode >>
+      steps:
+        - create-tfc-workspace: 
+            tfc-organization: << parameters.tfc-organization >>
+            tfc-workspace-name: << parameters.tfc-workspace-name >>
+            tfe-token: << parameters.tfe-token >>
   - run:
       name: terraform init
       working_directory: << parameters.working-directory >>

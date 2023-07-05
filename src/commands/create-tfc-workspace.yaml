@@ -1,0 +1,49 @@
+# src/commands/create-tfc-workspace.yaml
+
+description: |
+  Checks for a terraform cloud workspace. If it does not exist, it will be created as a local-execution mode 
+  workspace. The name checked/created 
+
+parameters:
+  tfc-organization:
+    description: terraform cloud organization Name
+    type: string
+    default: ""
+  tfc-workspace-name:
+    description: Used for workspace 'creation' workflow
+    type: string
+    default: ""
+  tfe-token:
+    description: terraform team-api token. Uses $TFE_TOKEN by default
+    type: string
+    default: $TFE_TOKEN
+steps:
+  - run:
+      name: Create tfcloud workspace
+      command: |
+        exists=$(curl \
+                --header "Authorization: Bearer $TFE_TOKEN" \
+                --header "Content-Type: application/vnd.api+json" \
+                https://app.terraform.io/api/v2/organizations/<< parameters.tfc-organization >>/workspaces/<< parameters.tfc-workspace-name >>)
+
+        result=$(echo $exists | jq -r .data.attributes.name )
+
+        if [[ "$result" == "null" ]]; then
+            echo "create workspace"
+            createworkspace=$(curl \
+              --header "Authorization: Bearer << parameters.tfe-token >>" \
+              --header "Content-Type: application/vnd.api+json" \
+              --request POST \
+              --data { "data": { "attributes": { "name": "<< parameters.tfc-workspace-name >>", "execution-mode": "local" }, "type": "workspaces" } } \
+              https://app.terraform.io/api/v2/organizations/<< parameters.tfc-organization >>/workspaces)
+
+              result=$(echo $createworkspace | jq -r .data.attributes.name )
+              if [[ "$result" == "null" ]]; then
+                echo "Error: $createworkspace"
+                exit 1
+              else
+                echo $result
+              fi
+        else
+          echo $result
+        fi
