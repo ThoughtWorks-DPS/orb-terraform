@@ -34,7 +34,7 @@ steps:
               --header "Authorization: Bearer << parameters.tfe-token >>" \
               --header "Content-Type: application/vnd.api+json" \
               --request POST \
-              --data { "data": { "attributes": { "name": "<< parameters.tfc-workspace-name >>", "execution-mode": "local" }, "type": "workspaces" } } \
+              --data '{ "data": { "attributes": { "name": "<< parameters.tfc-workspace-name >>", "execution-mode": "local" }, "type": "workspaces" } }' \
               https://app.terraform.io/api/v2/organizations/<< parameters.tfc-organization >>/workspaces)
 
               result=$(echo $createworkspace | jq -r .data.attributes.name )
