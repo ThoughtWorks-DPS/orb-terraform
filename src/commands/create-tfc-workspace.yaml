@@ -1,8 +1,8 @@
 # src/commands/create-tfc-workspace.yaml
 
 description: |
-  Checks for a terraform cloud workspace. If it does not exist, it will be created as a local-execution mode 
-  workspace. The name checked/created 
+  Checks for a terraform cloud workspace. If it does not exist, it will be created as a local-execution mode
+  workspace. The name checked/created
 
 parameters:
   tfc-organization:
@@ -22,7 +22,7 @@ steps:
       name: Create tfcloud workspace
       command: |
         exists=$(curl \
-                --header "Authorization: Bearer $TFE_TOKEN" \
+                --header "Authorization: Bearer << parameters.tfe-token >>" \
                 --header "Content-Type: application/vnd.api+json" \
                 https://app.terraform.io/api/v2/organizations/<< parameters.tfc-organization >>/workspaces/<< parameters.tfc-workspace-name >>)
 
