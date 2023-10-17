@@ -1,4 +1,6 @@
 # src/examples/static-analysis.yaml
+# yamllint disable rule:line-length
+---
 
 description: >
   Separate static analysis job prior to terraform plan using twdps/terraform orb.

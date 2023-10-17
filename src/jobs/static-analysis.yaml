@@ -1,4 +1,5 @@
 # /src/jobs/static-analysis.yaml
+# yamllint disable rule:line-length
 ---
 
 description: >
@@ -15,13 +16,13 @@ description: >
   - driftctl
   - infracost
 
-  
-  Note: The default executor image in this job is effectively set to Latest. While
-  this is efficient for orb development purposes, it is recommended to always pin
-  the executor version when using orbs in actual infrastructure pipelines.
+  Note: The default executor image in this job is effectively set to Latest.
+  While this is efficient for orb development purposes, it is recommended
+  to always pin the executor version when using orbs in actual infrastructure
+  pipelines.
 
-  Note: Executor resources sizes 2xlarge and 2xlarge+ require review by circleci
-  support. Open a support ticket to request access.
+  Note: Executor resources sizes 2xlarge and 2xlarge+ require review by
+  circleci support. Open a support ticket to request access.
 
 executor:
   name: circleci-infra-aws
@@ -45,12 +46,16 @@ parameters:
     default: docker.io/twdps/circleci-infra-aws:alpine-stable
 
   executor-registry-username:
-    description: Environment variable to reference as username for the registry specified by executor-image parameter
+    description: |
+      Environment variable to reference as username for the registry
+      specified by executor-image parameter
     type: env_var_name
     default: DOCKER_LOGIN
 
   executor-registry-password:
-    description: Environment variable to reference as password for the registry specified by executor-image parameter
+    description: |
+      Environment variable to reference as password for the registry
+      specified by executor-image parameter
     type: env_var_name
     default: DOCKER_PASSWORD
 
@@ -60,7 +65,9 @@ parameters:
     default: medium
 
   shell:
-    description: default shell invocation. Override to support different shells or tools like secrethub.io
+    description: |
+      default shell invocation. Override to support different shells or
+      tools like secrethub.io
     type: string
     default: /bin/bash -eo pipefail
 
@@ -143,7 +150,8 @@ parameters:
     default: ""
 
   backend-conf:
-    description: additional terraform init parameters to configure backend.conf if necessary
+    description: |
+      additional terraform init parameters to configure backend.conf if necessary
     type: string
     default: ""
 

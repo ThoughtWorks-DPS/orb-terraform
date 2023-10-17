@@ -3,7 +3,7 @@
 ---
 
 description: Confirm canonical format and validate terraform syntax.
-  
+
 parameters:
 
   working-directory:

@@ -218,8 +218,8 @@ steps:
       name: run tflint
       condition:
         and:
-         - << parameters.static-analysis >>
-         - << parameters.lint-terraform >>
+          - << parameters.static-analysis >>
+          - << parameters.lint-terraform >>
       steps:
         - tflint:
             working-directory: << parameters.working-directory >>
@@ -229,7 +229,7 @@ steps:
       name: Confirm or Create tfcloud workspace in local-execute-mode
       condition: << parameters.tfc-local-execution-mode >>
       steps:
-        - create-tfc-workspace: 
+        - create-tfc-workspace:
             tfc-organization: << parameters.tfc-organization >>
             tfc-workspace-name: << parameters.tfc-workspace-name >>
             tfe-token: << parameters.tfe-token >>

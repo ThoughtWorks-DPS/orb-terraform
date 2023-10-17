@@ -4,7 +4,7 @@
 
 description: >
   Terraform destroy workflow.
-  
+
   Includes the following optional customizations:
 
   - set desired terraform version. Default is the version installed on the executor.

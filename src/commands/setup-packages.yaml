@@ -46,7 +46,7 @@ steps:
             name: install checkov version << parameters.checkov-version >>
             command: sudo pip install --no-cache-dir --break-system-packages checkov==<< parameters.checkov-version >>
   - when:
-      condition:  << parameters.tfsec-version >>
+      condition: << parameters.tfsec-version >>
       steps:
         - run:
             name: install tfsec version << parameters.tfsec-version >>

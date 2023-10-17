@@ -34,4 +34,4 @@ steps:
       name: set tflint provider
       command: |
         echo -e ${<< parameters.public-key >>} | gpg --import
-        echo -e ${<< parameters.private-key >>} | gpg --passphrase ${GPG_KEY_PASSPHRASE} --import 
+        echo -e ${<< parameters.private-key >>} | gpg --passphrase ${GPG_KEY_PASSPHRASE} --import

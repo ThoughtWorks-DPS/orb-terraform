@@ -1,8 +1,10 @@
 # /src/jobs/apply.yaml
+# yamllint disable rule:line-length
+---
 
 description: >
   Terraform apply workflow.
-  
+
   Includes the following optional customizations:
 
   - set desired terraform version. Default is the version installed on the executor.
@@ -67,7 +69,7 @@ parameters:
     description: must provide the release version of terraform
     type: string
     default: ""
-  
+
   var-file:
     description: terraform variable file to include in plan
     type: string
