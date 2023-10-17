@@ -60,7 +60,7 @@ parameters:
   shell:
     description: default shell invocation. Override to support different shells or tools like secrethub.io
     type: string
-    default: /bin/sh -eo pipefail
+    default: /bin/bash -eo pipefail
 
   tflint-version:
     description: optional override to a specific release version of tflint
