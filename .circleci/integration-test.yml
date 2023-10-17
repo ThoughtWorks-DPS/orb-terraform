@@ -1,0 +1,42 @@
+---
+version: 2.1
+
+orbs:
+  terraform: twdps/terraform@dev:<<pipeline.git.revision>>
+  # orb-tools: circleci/orb-tools@12.0.4
+
+globals:
+  - &context orb-publishing
+  - &orb-name twdps/terraform
+
+# commands:
+#   assert-generated-file-against-expected:
+#     parameters:
+#       generated-file:
+#         type: string
+#     steps:
+#       - run:
+#           name: test sbxdev template file against expected
+#           command: |
+#             export result=$(cmp -s chart/overlays/compare-sbxdev.yaml << parameters.generated-file >>; echo $?)
+#             if [[ $result -ne 0 ]]; then
+#               echo "error: sbxdev-sample-app.yaml does not match expected output"
+#               exit 1
+#             fi
+
+jobs:
+
+  test setup-packages command:
+    docker:
+      - image: twdps/circleci-infra-aws:alpine-stable
+    steps:
+      - checkout
+      - terraform/setup-packages:
+          terraform-version: 1.6.0
+
+workflows:
+  version: 2
+
+  integration tests:
+    jobs:
+      - test setup-packages command
