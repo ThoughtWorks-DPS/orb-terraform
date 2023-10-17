@@ -2,31 +2,64 @@
 # yamllint disable rule:line-length
 ---
 
-description: >
-  Install specified package versions on executor. Keep in mind that the install
-  will use sudo since it assumes the executor container is expected to
-  running as a defined USER.
+description: |
+  Install specified package versions on executor for orb dependencies.
+  This is optional with the use of a twdps/circleci-infra convenience
+  image. Each package-version parameter below can be used to install
+  a specific version of the named package.
 
+  Supported packagesL
+  - terraform validate (default)
+  - tflint
+  - tfsec
+  - checkov
+  - snyk
+  - terrascan
+  - driftctl
+  - infracost
+
+  Note: When using your own custom executor, keep in mind that various
+  package management dependencies will be required, and the install
+  will use sudo since it assumes the executor container is unning as
+  a defined USER.
+
+  Package management dependencies:
+  - curl
+  - unzip
+  - pip
+  - gnupg(gpg)
 
 parameters:
 
   terraform-version:
-    description: optional override to a specific release version of terraform
     type: string
     default: ""
 
-  checkov-version:
-    description: optional override to a specific release version of checkov
+  tflint-version:
     type: string
     default: ""
 
   tfsec-version:
-    description: optional override to a specific release version of tfsec
+    type: string
+    default: ""
+
+  checkov-version:
     type: string
     default: ""
 
   snyk-version:
-    description: optional override to a specific release version of snyk
+    type: string
+    default: ""
+
+  terrascan:
+    type: string
+    default: ""
+
+  driftctl:
+    type: string
+    default: ""
+
+  infracost:
     type: string
     default: ""
 
@@ -36,15 +69,17 @@ steps:
       steps:
         - run:
             name: install terraform version << parameters.terraform-version >>
-            command: |
-              curl -SLO "https://releases.hashicorp.com/terraform/<< parameters.terraform-version >>/terraform_<< parameters.terraform-version >>_linux_amd64.zip"
-              sudo unzip -o "terraform_<< parameters.terraform-version >>_linux_amd64.zip" -d /usr/local/bin
+            environment:
+              TERRAFORM_VERSION: << parameters.terraform-version >>
+            command: <<include(scripts/install_terraform.sh)>>
   - when:
-      condition: << parameters.checkov-version >>
+      condition: << parameters.tflint-version >>
       steps:
         - run:
-            name: install checkov version << parameters.checkov-version >>
-            command: sudo pip install --no-cache-dir --break-system-packages checkov==<< parameters.checkov-version >>
+            name: install tflint version << parameters.tflint-version >>
+            command: |
+              curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | TFLINT_VERSION=<< parameters.tflint-version >> bash
+              tflint --version
   - when:
       condition: << parameters.tfsec-version >>
       steps:
@@ -54,6 +89,15 @@ steps:
               curl -SLO https://github.com/aquasecurity/tfsec/releases/download/v<< parameters.tfsec-version >>/tfsec-checkgen-linux-amd64
               chmod +x tfsec-checkgen-linux-amd64
               sudo mv tfsec-checkgen-linux-amd64 /usr/local/bin/tfsec
+              tfsec --version
+  - when:
+      condition: << parameters.checkov-version >>
+      steps:
+        - run:
+            name: install checkov version << parameters.checkov-version >>
+            command: |
+              sudo pip install --no-cache-dir --break-system-packages checkov==<< parameters.checkov-version >>
+              checkov --version
   - when:
       condition: << parameters.snyk-version >>
       steps:

@@ -23,25 +23,6 @@ on-tag-main: &on-tag-main
   tags:
     only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
-# jobs:
-#   test-python:
-#     docker:
-#       - image: ghcr.io/rbmarketplace/di-circleci-kube-ops:alpine-0.10.0
-#         auth:
-#           username: $DOCKER_LOGIN
-#           password: $DOCKER_PASSWORD
-#     steps:
-#       - checkout
-#       - setup_remote_docker
-#       - run:
-#           name: install deps
-#           command: |
-#             pip install --upgrade pip
-#             pip install pygithub
-#       - run:
-#           name: test python
-#           command: python -m unittest discover src/scripts/python
-
 workflows:
   version: 2
 
