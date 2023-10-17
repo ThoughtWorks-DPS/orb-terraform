@@ -1,17 +1,19 @@
 # src/executors/circleci-infra-aws.yaml
+---
 
 description: |
-  By default the orb will use twdps/circleci-infra-aws:stable as the executor image. 
-  You can override to use your own executor keeping in mind you will need sudo and curl on
-  the image to successfully install terraform. See the setup-packages command for details.
-  
+  By default the orb will use twdps/circleci-infra-aws:alpine-stable as the executor
+  image. You can override to use your own executor keeping in mind you will need sudo
+  and curl on the image to successfully install terraform. See the setup-packages
+  command for details.
+
   See https://github.com/ThoughtWorks-DPS/circleci-aws-infra
 
 parameters:
   executor-image:
-    description: available override
+    description: Override the default image
     type: string
-    default: twdps/circleci-infra-aws:stable
+    default: docker.io/twdps/circleci-infra-aws:stable
 
   resource-class:
     type: enum
@@ -35,4 +37,3 @@ docker:
     auth:
       username: ${<< parameters.username >>}
       password: ${<< parameters.password >>}
-

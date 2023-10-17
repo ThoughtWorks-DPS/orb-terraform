@@ -1,4 +1,6 @@
 # src/commands/setup-packages.yaml
+# yamllint disable rule:line-length
+---
 
 description: >
   Install specified package versions on executor. Keep in mind that the install

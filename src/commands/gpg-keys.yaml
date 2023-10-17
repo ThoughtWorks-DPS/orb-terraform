@@ -1,16 +1,17 @@
 # src/commands/gpg-keys.yaml
-
+# yamllint disable rule:line-length
+---
 description: |
   Load public and private gpg keys. Terraform supports use of a public gpg key for encryption of iam-user secret
   credentials within the terraform state file. A common terraform pipeline behavior is fetching and decoding
-  these keys. 
-  
+  these keys.
+
   Overrides available:
   - use tflint-version parameter to use a specific version of tflint; default is latest
   - generates a .tflint.hcl config file to support the tflint-provider specified
   - You can fully manage configuration by maintaining .tflint.hcl in your repo
   - if you include a .tflint.hcl file, be sure to specify a provider; e.g., plugin "aws" { enabled = true }
-  
+
 parameters:
 
   public-key:

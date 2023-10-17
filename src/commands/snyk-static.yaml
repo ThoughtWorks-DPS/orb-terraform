@@ -1,4 +1,6 @@
 # src/commands/snyk-static.yaml
+# yamllint disable rule:line-length
+---
 
 description: |
   Basic Snyk IaC static analysis of source files.

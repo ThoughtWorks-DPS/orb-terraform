@@ -1,5 +1,6 @@
 # src/commands/create-tfc-workspace.yaml
-
+# yamllint disable rule:line-length
+---
 description: |
   Checks for a terraform cloud workspace. If it does not exist, it will be created as a local-execution mode
   workspace. The name checked/created

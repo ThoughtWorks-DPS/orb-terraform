@@ -1,4 +1,6 @@
 # /src/jobs/destroy.yaml
+# yamllint disable rule:line-length
+---
 
 description: >
   Terraform destroy workflow.
@@ -67,12 +69,12 @@ parameters:
     description: must provide the release version of terraform
     type: string
     default: ""
-  
+
   var-file:
     description: terraform variable file to include in plan
     type: string
     default: ""
-  
+
   extra-terraform-args:
     description: additional command line arguements for terraform plan
     type: string

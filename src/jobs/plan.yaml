@@ -1,4 +1,6 @@
 # /src/jobs/plan.yaml
+# yamllint disable rule:line-length
+---
 
 description: >
   Terraform plan workflow.
@@ -59,7 +61,7 @@ parameters:
 
   resource-class:
     type: enum
-    enum: [ small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+ ]
+    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
     default: medium
 
   shell:
@@ -80,7 +82,7 @@ parameters:
   tflint-provider:
     description: provider for tflint plugin
     type: enum
-    enum: [ "aws", "azurerm", "google" ]
+    enum: ["aws", "azurerm", "google"]
     default: aws
 
   lint-terraform:
@@ -180,17 +182,17 @@ parameters:
   before-terraform:
     description: Optional steps to run before running terraform
     type: steps
-    default: [ ]
+    default: []
 
   after-terraform-init:
     description: Optional steps to run after terraform init but before running terraform plan
     type: steps
-    default: [ ]
+    default: []
 
   after-terraform:
     description: Optional steps to run after running terraform plan
     type: steps
-    default: [ ]
+    default: []
 
   static-analysis:
     description: |
@@ -270,11 +272,11 @@ steps:
       condition:
         or:
           - and:
-            - << parameters.static-analysis >>
-            - << parameters.checkov-scan >>
+              - << parameters.static-analysis >>
+              - << parameters.checkov-scan >>
           - and:
-            - << parameters.static-analysis >>
-            - << parameters.snyk-scan >>
+              - << parameters.static-analysis >>
+              - << parameters.snyk-scan >>
       steps:
         - generate-terraform-json:
             working-directory: << parameters.working-directory >>

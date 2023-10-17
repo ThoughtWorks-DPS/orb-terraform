@@ -1,4 +1,6 @@
 # src/commands/snyk.yaml
+# yamllint disable rule:line-length
+---
 
 description: |
   Snyk IaC static scan against terraform plan output json.

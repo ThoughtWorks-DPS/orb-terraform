@@ -1,4 +1,6 @@
 # src/commands/validate.yaml
+# yamllint disable rule:line-length
+---
 
 description: Confirm canonical format and validate terraform syntax.
   
@@ -18,4 +20,3 @@ steps:
       name: validate terraform files
       working_directory: << parameters.working-directory >>
       command: terraform validate
-

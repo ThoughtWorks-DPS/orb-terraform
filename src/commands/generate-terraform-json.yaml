@@ -1,4 +1,5 @@
 # src/commands/generate-terraform-json.yaml
+---
 
 description: |
   convert binary terraform plan into json for analysis by security tools

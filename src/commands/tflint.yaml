@@ -1,14 +1,16 @@
 # src/commands/tflint.yaml
+# yamllint disable rule:line-length
+---
 
 description: |
   Run terraform-linters/tflint in working-directory.
-  
+
   Overrides available:
   - use tflint-version parameter to use a specific version of tflint; default is latest.
   - generates a .tflint.hcl config file to support the tflint-provider specified.
   - You can fully manage configuration by maintaining .tflint.hcl in your repo.
   - if you include a .tflint.hcl file, be sure to specify a provider; e.g., plugin "aws" { enabled = true }.
-  
+
 parameters:
 
   working-directory:

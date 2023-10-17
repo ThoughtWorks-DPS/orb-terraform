@@ -1,4 +1,6 @@
 # src/commands/checkov.yaml
+# yamllint disable rule:line-length
+---
 
 description: |
   Basic checkov against terraform plan output json.

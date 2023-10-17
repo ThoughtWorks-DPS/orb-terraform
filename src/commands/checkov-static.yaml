@@ -1,4 +1,6 @@
 # src/commands/checkov-static.yaml
+# yamllint disable rule:line-length
+---
 
 description: |
   Basic checkov static analysis.

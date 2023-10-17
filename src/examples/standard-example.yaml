@@ -1,5 +1,6 @@
 # src/examples/standard-example.yaml
-
+# yamllint disable rule:line-length
+---
 description: Standard usage of the twdps/terraform orb plan and apply jobs.
 
 usage:
