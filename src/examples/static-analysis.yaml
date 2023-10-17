@@ -9,7 +9,7 @@ usage:
   version: 2.1
 
   orbs:
-    terraform: twdps/terraform@0.12.0
+    terraform: twdps/terraform@1.0.0
 
   # ==== global pipeline parameters
   globals:
