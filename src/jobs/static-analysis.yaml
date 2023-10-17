@@ -1,7 +1,25 @@
 # /src/jobs/static-analysis.yaml
 
 description: >
-  Run static analysis and linting tools (tfsec, tflint, checkov, snyk-iac)
+  Standalone job that can perform a selectable set of terraform code static
+  analysis and linting tasks.
+
+  Supported tools:
+  - terraform fmt*
+  - terraform validate*
+  - tflint
+  - tfsec
+  - checkov
+  - snyk
+  - terrascan
+  - driftctl
+  - infracost
+
+  *True by default
+
+  Note: The default executor image in this job is effectively set to Latest. While
+  this is efficient for orb development purposes, it is recommended to always pin
+  the executor version when using orbs in actual infrastructure pipelines.
 
 executor:
   name: circleci-infra-aws
