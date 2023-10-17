@@ -1,97 +1,201 @@
 ---
 version: 2.1
 
-orbs:
-  orb-tools: twdps/orb-tools@0.1.1
+setup: true
 
-dev-release-filter: &dev-release-filter
+orbs:
+  orb-tools: circleci/orb-tools@12.0.4
+  shellcheck: circleci/shellcheck@3.2.0
+  
+globals:
+  - &context orb-publishing
+  - &orb-name twdps/terraform
+
+on-push-main: &on-push-main
   branches:
     only: /main/
   tags:
     ignore: /.*/
 
-edit-tag-publish-filter: &edit-tag-publish-filter
+on-tag-main: &on-tag-main
   branches:
     ignore: /.*/
   tags:
-    only: /^edit.*/
+    only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
-patch-tag-publish-filter: &patch-tag-publish-filter
-  branches:
-    ignore: /.*/
-  tags:
-    only: /^patch.*/
-
-minor-tag-publish-filter: &minor-tag-publish-filter
-  branches:
-    ignore: /.*/
-  tags:
-    only: /^minor.*/
-
-major-tag-publish-filter: &major-tag-publish-filter
-  branches:
-    ignore: /.*/
-  tags:
-    only: /^major.*/
+# jobs:
+#   test-python:
+#     docker:
+#       - image: ghcr.io/rbmarketplace/di-circleci-kube-ops:alpine-0.10.0
+#         auth:
+#           username: $DOCKER_LOGIN
+#           password: $DOCKER_PASSWORD
+#     steps:
+#       - checkout
+#       - setup_remote_docker
+#       - run:
+#           name: install deps
+#           command: |
+#             pip install --upgrade pip
+#             pip install pygithub
+#       - run:
+#           name: test python
+#           command: python -m unittest discover src/scripts/python
 
 workflows:
   version: 2
 
-  dev-release-terraform-orb:
+  static analysis and test:
     jobs:
-      - orb-tools/validate:
-          filters: *dev-release-filter
+      - orb-tools/lint:
+          filters: *on-push-main
 
-      - orb-tools/publish-dev:
-          context: twdps-orb-authors
-          orb-name: twdps/terraform
-          filters: *dev-release-filter
+      - orb-tools/review:
+          max_command_length: 100
+          exclude: RC006,RC010,RC007,RC003
+          filters: *on-push-main
+
+      - shellcheck/check:
+          filters: *on-push-main
+
+      - orb-tools/pack:
+          filters: *on-push-main
+
+      - orb-tools/publish:
+          name: publish development package
+          context: *context
+          orb_name: *orb-name
+          vcs_type: << pipeline.project.type >>
+          filters: *on-push-main
           requires:
-            - orb-tools/validate
+            - orb-tools/lint
+            - orb-tools/review
+            - shellcheck/check
+            - orb-tools/pack
 
-      - approve-release:
-          type: approval
-          requires:
-            - orb-tools/publish-dev
-          filters: *dev-release-filter
+      # - orb-tools/continue:
+      #     name: Launch integration test pipeline
+      #     context: *context
+      #     orb_name: *orb-name
+      #     config_path: .circleci/integration-test.yml
+      #     pipeline_number: << pipeline.number >>
+      #     vcs_type: << pipeline.project.type >>
+      #     filters: *on-push-main
+      #     requires:
+      #       - publish development package
 
-      - orb-tools/release-tag:
-          context: twdps-orb-authors
-          ssh-fingerprints: $SVC_FINGERPRINT
-          use-git-diff: false
-          static-release-type: minor
-          filters: *dev-release-filter
-          requires:
-            - approve-release
+  # release:
+  #   jobs:
+  #     - orb-tools/pack:
+  #         filters: *on-tag-main
 
-  promote-orb-tools:
-    jobs:
-      # patch, minor, or major publishing, depending on which orb source
-      # files have been modified 
-      - orb-tools/promote-dev-to-prod:
-          name: patch-release
-          context: twdps-orb-authors
-          release: patch
-          orb-name: twdps/terraform
-          ssh-fingerprints: $SVC_FINGERPRINT
-          filters: *patch-tag-publish-filter
+  #     - orb-tools/publish:
+  #         name: publish release version
+  #         context: *context
+  #         orb_name: *orb-name
+  #         vcs_type: << pipeline.project.type >>
+  #         pub_type: production
+  #         filters: *on-tag-main
+  #         requires:
+  #           - orb-tools/pack
 
-      - orb-tools/promote-dev-to-prod:
-          name: minor-release
-          context: twdps-orb-authors
-          release: minor
-          orb-name: twdps/terraform
-          ssh-fingerprints: $SVC_FINGERPRINT
-          filters: *minor-tag-publish-filter
 
-      - orb-tools/promote-dev-to-prod:
-          name: major-release
-          context: twdps-orb-authors
-          release: major
-          orb-name: twdps/terraform
-          ssh-fingerprints: $SVC_FINGERPRINT
-          filters: *major-tag-publish-filter
 
-      - orb-tools/documentation-only:
-          name: documentation-updates
-          filters: *edit-tag-publish-filter
+
+
+
+
+# orbs:
+#   orb-tools: twdps/orb-tools@0.1.1
+
+# dev-release-filter: &dev-release-filter
+#   branches:
+#     only: /main/
+#   tags:
+#     ignore: /.*/
+
+# edit-tag-publish-filter: &edit-tag-publish-filter
+#   branches:
+#     ignore: /.*/
+#   tags:
+#     only: /^edit.*/
+
+# patch-tag-publish-filter: &patch-tag-publish-filter
+#   branches:
+#     ignore: /.*/
+#   tags:
+#     only: /^patch.*/
+
+# minor-tag-publish-filter: &minor-tag-publish-filter
+#   branches:
+#     ignore: /.*/
+#   tags:
+#     only: /^minor.*/
+
+# major-tag-publish-filter: &major-tag-publish-filter
+#   branches:
+#     ignore: /.*/
+#   tags:
+#     only: /^major.*/
+
+# workflows:
+#   version: 2
+
+#   dev-release-terraform-orb:
+#     jobs:
+#       - orb-tools/validate:
+#           filters: *dev-release-filter
+
+#       - orb-tools/publish-dev:
+#           context: twdps-orb-authors
+#           orb-name: twdps/terraform
+#           filters: *dev-release-filter
+#           requires:
+#             - orb-tools/validate
+
+#       - approve-release:
+#           type: approval
+#           requires:
+#             - orb-tools/publish-dev
+#           filters: *dev-release-filter
+
+#       - orb-tools/release-tag:
+#           context: twdps-orb-authors
+#           ssh-fingerprints: $SVC_FINGERPRINT
+#           use-git-diff: false
+#           static-release-type: minor
+#           filters: *dev-release-filter
+#           requires:
+#             - approve-release
+
+#   promote-orb-tools:
+#     jobs:
+#       # patch, minor, or major publishing, depending on which orb source
+#       # files have been modified 
+#       - orb-tools/promote-dev-to-prod:
+#           name: patch-release
+#           context: twdps-orb-authors
+#           release: patch
+#           orb-name: twdps/terraform
+#           ssh-fingerprints: $SVC_FINGERPRINT
+#           filters: *patch-tag-publish-filter
+
+#       - orb-tools/promote-dev-to-prod:
+#           name: minor-release
+#           context: twdps-orb-authors
+#           release: minor
+#           orb-name: twdps/terraform
+#           ssh-fingerprints: $SVC_FINGERPRINT
+#           filters: *minor-tag-publish-filter
+
+#       - orb-tools/promote-dev-to-prod:
+#           name: major-release
+#           context: twdps-orb-authors
+#           release: major
+#           orb-name: twdps/terraform
+#           ssh-fingerprints: $SVC_FINGERPRINT
+#           filters: *major-tag-publish-filter
+
+#       - orb-tools/documentation-only:
+#           name: documentation-updates
+#           filters: *edit-tag-publish-filter
