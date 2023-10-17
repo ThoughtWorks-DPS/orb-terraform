@@ -16,7 +16,7 @@ curl --remote-name "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION
 curl --remote-name "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS.sig"
 
 # verify SHA signature
-if result=$(gpg --verify "../terraform_${TERRAFORM_VERSION}_SHA256SUMS.sig" "../terraform_${TERRAFORM_VERSION}_SHA256SUMS" 2>&1); then
+if result=$(gpg --verify "terraform_${TERRAFORM_VERSION}_SHA256SUMS.sig" "terraform_${TERRAFORM_VERSION}_SHA256SUMS" 2>&1); then
     echo "Verified SHA signature"
 else
     echo "Unable to verify SHA signature"
@@ -26,7 +26,7 @@ else
 fi
 
 # verify terraform cli package
-if result=$(shasum --ignore-missing --algorithm 256 --check "../terraform_${TERRAFORM_VERSION}_SHA256SUMS" 2>&1); then
+if result=$(shasum --ignore-missing --algorithm 256 --check "terraform_${TERRAFORM_VERSION}_SHA256SUMS" 2>&1); then
     echo "Verified terraform package"
 else
     echo "Unable to terraform package"
@@ -36,5 +36,5 @@ else
 fi
 
 # install and smoke test terraform cli
-sudo unzip -o "../terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -d /usr/local/bin
+sudo unzip -o "terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -d /usr/local/bin
 terraform version
