@@ -5,8 +5,7 @@ description: >
   analysis and linting tasks.
 
   Supported tools:
-  - terraform fmt*
-  - terraform validate*
+  - terraform validate (default)
   - tflint
   - tfsec
   - checkov
@@ -15,11 +14,13 @@ description: >
   - driftctl
   - infracost
 
-  *True by default
-
+  
   Note: The default executor image in this job is effectively set to Latest. While
   this is efficient for orb development purposes, it is recommended to always pin
   the executor version when using orbs in actual infrastructure pipelines.
+
+  Note: Executor resources sizes 2xlarge and 2xlarge+ require review by circleci
+  support. Open a support ticket to request access.
 
 executor:
   name: circleci-infra-aws
@@ -62,16 +63,26 @@ parameters:
     type: string
     default: /bin/bash -eo pipefail
 
-  tflint-version:
-    description: optional override to a specific release version of tflint
-    type: string
-    default: 'latest'
 
-  lint-terraform:
+  terraform-validate:
+    description: |
+      Validate runs checks that verify whether a configuration is syntactically
+      valid and internally consistent, regardless of any provided variables or
+      existing state. It is thus primarily useful for general verification of
+      reusable modules, including correctness of attribute names and value types.
+    type: boolean
+    default: true
+
+  tflint:
     description: |
       perform tflint of terraform files.
     type: boolean
     default: true
+
+  tflint-version:
+    description: optional override to a specific release version of tflint
+    type: string
+    default: 'latest'
 
   tflint-provider:
     description: provider for tflint plugin
@@ -79,6 +90,7 @@ parameters:
     enum: ["aws", "azurerm", "google"]
     default: aws
 
+  #checkov:
   checkov-version:
     description: optional override to a specific release version of checkov
     type: string
@@ -119,11 +131,6 @@ parameters:
     type: string
     default: ""
 
-  validate-terraform-fmt:
-    description: perform terraform fmt and validate
-    type: boolean
-    default: true
-
   snyk-organization:
     description: the Snyk organization to reference
     type: string
@@ -157,49 +164,49 @@ steps:
       condition: << parameters.before-static-analysis >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-static-analysis >>
-  - setup-packages:
-      snyk-version: << parameters.snyk-version >>
-      checkov-version: << parameters.checkov-version >>
-      tfsec-version: << parameters.tfsec-version >>
+  # - setup-packages:
+  #     snyk-version: << parameters.snyk-version >>
+  #     checkov-version: << parameters.checkov-version >>
+  #     tfsec-version: << parameters.tfsec-version >>
+  # - when:
+  #     name: run tflint
+  #     condition: << parameters.lint-terraform >>
+  #     steps:
+  #       - tflint:
+  #           working-directory: << parameters.working-directory >>
+  #           tflint-version: << parameters.tflint-version >>
+  #           tflint-provider: << parameters.tflint-provider >>
+  # - run:
+  #     name: terraform init
+  #     working_directory: << parameters.working-directory >>
+  #     command: |
+  #       terraform version
+  #       terraform init -backend=false <<#parameters.backend-conf>> << parameters.backend-conf >> <</parameters.backend-conf>>
+  # - when:
+  #     name: perform tfsec scan of terraform source files
+  #     condition: << parameters.tfsec-scan >>
+  #     steps:
+  #       - tfsec:
+  #           working-directory: << parameters.working-directory >>
+  #           tfsec-additional-args: << parameters.tfsec-additional-args >>
+  # - when:
+  #     name: run Snyk IaC inspection of TF source files
+  #     condition: << parameters.snyk-scan >>
+  #     steps:
+  #       - snyk-static:
+  #           working-directory: << parameters.working-directory >>
+  #           organization: << parameters.snyk-organization >>
+  #           snyk-additional-args: << parameters.snyk-additional-args >>
+  # - when:
+  #     name: run checkov inspection of terraform source files
+  #     condition: << parameters.checkov-scan >>
+  #     steps:
+  #       - checkov-static:
+  #           working-directory: << parameters.working-directory >>
+  #           checkov-additional-args: << parameters.checkov-additional-args >>
   - when:
-      name: run tflint
-      condition: << parameters.lint-terraform >>
-      steps:
-        - tflint:
-            working-directory: << parameters.working-directory >>
-            tflint-version: << parameters.tflint-version >>
-            tflint-provider: << parameters.tflint-provider >>
-  - run:
-      name: terraform init
-      working_directory: << parameters.working-directory >>
-      command: |
-        terraform version
-        terraform init -backend=false <<#parameters.backend-conf>> << parameters.backend-conf >> <</parameters.backend-conf>>
-  - when:
-      name: perform tfsec scan of terraform source files
-      condition: << parameters.tfsec-scan >>
-      steps:
-        - tfsec:
-            working-directory: << parameters.working-directory >>
-            tfsec-additional-args: << parameters.tfsec-additional-args >>
-  - when:
-      name: run Snyk IaC inspection of TF source files
-      condition: << parameters.snyk-scan >>
-      steps:
-        - snyk-static:
-            working-directory: << parameters.working-directory >>
-            organization: << parameters.snyk-organization >>
-            snyk-additional-args: << parameters.snyk-additional-args >>
-  - when:
-      name: run checkov inspection of terraform source files
-      condition: << parameters.checkov-scan >>
-      steps:
-        - checkov-static:
-            working-directory: << parameters.working-directory >>
-            checkov-additional-args: << parameters.checkov-additional-args >>
-  - when:
-      name: perform terraform fmt and validate
-      condition: << parameters.validate-terraform-fmt >>
+      name: perform terraform validate
+      condition: << parameters.terraform-validate >>
       steps:
         - validate:
             working-directory: << parameters.working-directory >>
