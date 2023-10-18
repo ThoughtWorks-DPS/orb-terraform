@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-# download tflint package and verification packages
+# download tflint and verification packages
 curl -SLO "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_amd64.zip"
 curl -SLO "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/checksums.txt"
 curl -SLO "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/checksums.txt.pem"
 curl -SLO "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/checksums.txt.keyless.sig"
 
-# verify cosign orignation
+# verify cosign origination
 if result=$(cosign verify-blob --certificate=checksums.txt.pem --signature=checksums.txt.keyless.sig --certificate-identity-regexp="^https://github.com/terraform-linters/tflint" --certificate-oidc-issuer=https://token.actions.githubusercontent.com checksums.txt 2>&1); then
     echo "Verified cosign build source"
 else
