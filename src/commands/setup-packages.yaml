@@ -28,6 +28,8 @@ description: |
   - unzip
   - pip
   - gnupg(gpg)
+  - shasum
+  - cosign
 
 parameters:
 
@@ -77,9 +79,9 @@ steps:
       steps:
         - run:
             name: install tflint version << parameters.tflint-version >>
-            command: |
-              curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | TFLINT_VERSION=<< parameters.tflint-version >> bash
-              tflint --version
+            environment:
+              TFLINT_VERSION: << parameters.tflint-version >>
+            command: <<include(scripts/install_tflint.sh)>>
   - when:
       condition: << parameters.tfsec-version >>
       steps:
