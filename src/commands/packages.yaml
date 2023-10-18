@@ -118,4 +118,3 @@ steps:
         - run:
             name: install snyk version << parameters.snyk-version >>
             command: |
-
