@@ -16,6 +16,6 @@ else
 fi
 
 # install and smoke test trivy
-tar -xzf "trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+sudo tar -xzf "trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
 sudo mv trivy /usr/local/bin/trivy
 trivy --version

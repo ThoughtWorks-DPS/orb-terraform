@@ -127,3 +127,19 @@ steps:
             environment:
               TERRASCAN_VERSION: << parameters.terrascan-version >>
             command: <<include(scripts/install_terrascan.sh)>>
+  - when:
+      condition: << parameters.driftctl-version >>
+      steps:
+        - run:
+            name: install driftctl version << parameters.driftctl-version >>
+            environment:
+              DRIFTCTL_VERSION: << parameters.driftctl-version >>
+            command: <<include(scripts/install_driftctl.sh)>>
+  - when:
+      condition: << parameters.infracost-version >>
+      steps:
+        - run:
+            name: install infracost version << parameters.infracost-version >>
+            environment:
+              INFRACOST_VERSION: << parameters.infracost-version >>
+            command: <<include(scripts/install_infracost.sh)>>
