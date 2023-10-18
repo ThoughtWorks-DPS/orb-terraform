@@ -142,4 +142,4 @@ steps:
             name: install infracost version << parameters.infracost-version >>
             environment:
               INFRACOST_VERSION: << parameters.infracost-version >>
-            command: <<include(scripts/install_infracost.sh)>>
+            command: <<include(scripts/install_infracost.sh)>
