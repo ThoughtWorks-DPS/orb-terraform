@@ -111,10 +111,19 @@ steps:
             command: |
               sudo pip install --no-cache-dir --break-system-packages checkov==<< parameters.checkov-version >>
               checkov --version
-
   - when:
       condition: << parameters.snyk-version >>
       steps:
         - run:
             name: install snyk version << parameters.snyk-version >>
-            command: |
+            environment:
+              SNYK_VERSION: << parameters.snyk-version >>
+            command: <<include(scripts/install_snyk.sh)>>
+  - when:
+      condition: << parameters.terrascan-version >>
+      steps:
+        - run:
+            name: install terrascan version << parameters.terrascan-version >>
+            environment:
+              TERRASCAN_VERSION: << parameters.terrascan-version >>
+            command: <<include(scripts/install_terrascan.sh)>>
