@@ -108,7 +108,7 @@ steps:
       condition: << parameters.before-terraform >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-terraform >>
-  - setup-packages:
+  - packages:
       terraform-version: << parameters.terraform-version >>
   - run:
       name: terraform init

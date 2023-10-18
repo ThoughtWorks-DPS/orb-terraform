@@ -209,7 +209,7 @@ steps:
       condition: << parameters.before-terraform >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-terraform >>
-  - setup-packages:
+  - packages:
       snyk-version: << parameters.snyk-version >>
       terraform-version: << parameters.terraform-version >>
       checkov-version: << parameters.checkov-version >>
