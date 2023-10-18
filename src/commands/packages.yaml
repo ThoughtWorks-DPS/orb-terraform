@@ -111,7 +111,7 @@ steps:
             command: |
               sudo pip install --no-cache-dir --break-system-packages checkov==<< parameters.checkov-version >>
               checkov --version
-  
+
   - when:
       condition: << parameters.snyk-version >>
       steps:
