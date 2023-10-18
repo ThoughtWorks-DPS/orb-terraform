@@ -45,6 +45,10 @@ parameters:
     type: string
     default: ""
 
+  trivy-version:
+    type: string
+    default: ""
+
   checkov-version:
     type: string
     default: ""
@@ -87,11 +91,18 @@ steps:
       steps:
         - run:
             name: install tfsec version << parameters.tfsec-version >>
-            command: |
-              curl -SLO https://github.com/aquasecurity/tfsec/releases/download/v<< parameters.tfsec-version >>/tfsec-checkgen-linux-amd64
-              chmod +x tfsec-checkgen-linux-amd64
-              sudo mv tfsec-checkgen-linux-amd64 /usr/local/bin/tfsec
-              tfsec --version
+            environment:
+              TFSEC_VERSION: << parameters.tfsec-version >>
+            command: <<include(scripts/install_tfsec.sh)>>
+  - when:
+      condition: << parameters.trivy-version >>
+      steps:
+        - run:
+            name: install trivy version << parameters.trivy-version >>
+            environment:
+              TRIVY_VERSION: << parameters.trivy-version >>
+            command: <<include(scripts/install_trivy.sh)>>
+
   - when:
       condition: << parameters.checkov-version >>
       steps:
