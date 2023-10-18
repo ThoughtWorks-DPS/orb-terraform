@@ -31,3 +31,4 @@ fi
 # install and smoke test snyk
 chmod +x "${SNYK_PACKAGE_NAME}"
 sudo mv "${SNYK_PACKAGE_NAME}" /usr/local/bin/snyk
+snyk version
