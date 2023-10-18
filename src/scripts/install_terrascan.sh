@@ -14,6 +14,6 @@ else
     exit 1
 fi
 
-tar -xf terrascan_${TERRASCAN_VERSION}_Linux_x86_64.tar.gz terrascan
+tar -xf "terrascan_${TERRASCAN_VERSION}_Linux_x86_64.tar.gz" terrascan
 sudo mv terrascan /usr/local/bin/terrascan
 terrascan version
