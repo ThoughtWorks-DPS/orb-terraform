@@ -20,7 +20,7 @@ fi
 if result=$(shasum --ignore-missing --algorithm 256 --check  checksums.txt 2>&1); then
     echo "Verified tflint package sha"
 else
-    echo "Unable to verify tflint package sha""
+    echo "Unable to verify tflint package sha"
     echo "shasum Output:"
     echo "$result"
     exit 1

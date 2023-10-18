@@ -58,15 +58,15 @@ parameters:
     type: string
     default: ""
 
-  terrascan:
+  terrascan-version:
     type: string
     default: ""
 
-  driftctl:
+  driftctl-version:
     type: string
     default: ""
 
-  infracost:
+  infracost-version:
     type: string
     default: ""
 
