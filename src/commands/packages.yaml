@@ -20,7 +20,7 @@ description: |
 
   Note: When using your own custom executor, keep in mind that various
   package management dependencies will be required, and the install
-  will use sudo since it assumes the executor container is unning as
+  will use sudo since it assumes the executor container is running as
   a defined USER.
 
   Package management dependencies:
@@ -30,6 +30,7 @@ description: |
   - gnupg(gpg)
   - shasum
   - cosign
+  - python/pip
 
 parameters:
 
@@ -102,7 +103,6 @@ steps:
             environment:
               TRIVY_VERSION: << parameters.trivy-version >>
             command: <<include(scripts/install_trivy.sh)>>
-
   - when:
       condition: << parameters.checkov-version >>
       steps:
@@ -111,6 +111,7 @@ steps:
             command: |
               sudo pip install --no-cache-dir --break-system-packages checkov==<< parameters.checkov-version >>
               checkov --version
+              
   - when:
       condition: << parameters.snyk-version >>
       steps:
