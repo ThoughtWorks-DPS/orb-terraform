@@ -18,9 +18,9 @@ fi
 
 # verify cosign package sha
 if result=$(shasum --ignore-missing --algorithm 256 --check  checksums.txt 2>&1); then
-    echo "Verified cosign package sha"
+    echo "Verified tflint package sha"
 else
-    echo "Unable to verify cosign build source"
+    echo "Unable to verify tflint package sha""
     echo "shasum Output:"
     echo "$result"
     exit 1
