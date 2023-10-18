@@ -29,7 +29,7 @@ fi
 if result=$(shasum --ignore-missing --algorithm 256 --check "terraform_${TERRAFORM_VERSION}_SHA256SUMS" 2>&1); then
     echo "Verified terraform package"
 else
-    echo "Unable to terraform package"
+    echo "Unable to verify terraform package"
     echo "shasum Output:"
     echo "$result"
     exit 1

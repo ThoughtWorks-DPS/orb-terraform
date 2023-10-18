@@ -20,7 +20,7 @@ fi
 if result=$(shasum --ignore-missing --algorithm 256 --check  checksums.txt 2>&1); then
     echo "Verified cosign package sha"
 else
-    echo "Unable to veridy cosign build source"
+    echo "Unable to verify cosign build source"
     echo "shasum Output:"
     echo "$result"
     exit 1
