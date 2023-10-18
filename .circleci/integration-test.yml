@@ -26,12 +26,12 @@ globals:
 
 jobs:
 
-  test setup-packages command:
+  test packages command:
     docker:
       - image: twdps/circleci-infra-aws:alpine-stable
     steps:
       - checkout
-      - terraform/setup-packages:
+      - terraform/packages:
           terraform-version: 1.6.0
           tflint-version: 0.48.0
           tfsec-version: 1.28.4
@@ -42,4 +42,4 @@ workflows:
 
   integration tests:
     jobs:
-      - test setup-packages command
+      - test packages command
