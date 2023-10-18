@@ -4,7 +4,7 @@
 curl -SLO "https://github.com/aquasecurity/tfsec/releases/download/v${TFSEC_VERSION}/tfsec-linux-amd64"
 curl -SLO "https://github.com/aquasecurity/tfsec/releases/download/v${TFSEC_VERSION}/tfsec-linux-amd64.D66B222A3EA4C25D5D1A097FC34ACEFB46EC39CE.sig"
 curl -SLO "https://github.com/aquasecurity/tfsec/releases/download/v${TFSEC_VERSION}/tfsec_checksums.txt"
-cat tfsec_checksums.txt | grep tfsec-linux-amd64 > checksums.txt
+grep tfsec-linux-amd64 < tfsec_checksums.txt > checksums.txt
 
 cat <<EOF > tfsec.key
 -----BEGIN PGP PUBLIC KEY BLOCK-----
