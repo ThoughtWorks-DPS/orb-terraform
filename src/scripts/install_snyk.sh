@@ -2,7 +2,7 @@
 
 # download snyk and verification packages
 SNYK_SIGNING_KEY=A22665FB96CAB0E0973604C83676C4B8289C296E
-SNYK_PACKAGE_NAME=$(cat /etc/os-release | grep -q alpine && echo "snyk-alpine" || echo "snyk-linux")
+SNYK_PACKAGE_NAME=$(grep -q 'ID=alpine' /etc/os-release && echo "snyk-alpine" || echo "snyk-linux")
 curl -sSLO "https://static.snyk.io/cli/v${SNYK_VERSION}/${SNYK_PACKAGE_NAME}"
 curl -sSLO "https://static.snyk.io/cli/v${SNYK_VERSION}/sha256sums.txt.asc"
 grep "${SNYK_PACKAGE_NAME}" < sha256sums.txt.asc > checksums.txt
