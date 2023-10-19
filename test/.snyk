@@ -1,0 +1,14 @@
+
+ignore:
+  'SNYK-CC-AWS-415':
+    - '*':
+        reason: CloudWatch log group not encrypted with managed key
+        expires: '2030-01-01T14:26:34.404Z'
+  'SNYK-CC-TF-134':
+    - '*':
+        reason: CloudWatch Log group retention period not set
+        expires: '2030-01-01T14:26:34.404Z'
+  'SNYK-CC-AWS-423':
+    - '*':
+        reason: Default VPC resource detected
+        expires: '2030-01-01T14:26:34.404Z'
