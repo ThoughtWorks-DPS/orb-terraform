@@ -9,6 +9,25 @@ globals:
   - &context orb-publishing
   - &orb-name twdps/terraform
 
+commands:
+
+  before-job-message:
+    parameters:
+      msg:
+        type: string
+    steps:
+      - run:
+          name: echo before-msg
+          command: echo "before - << parameters.msg >>"
+
+  after-job-message:
+    parameters:
+      msg:
+        type: string
+    steps:
+      - run:
+          name: echo after-msg param
+          command: echo "after - << parameters.msg >>"
 jobs:
 
   test packages command:
@@ -33,3 +52,37 @@ workflows:
   integration tests:
     jobs:
       - test packages command
+
+      - terraform/static-analysis:
+          working-directory: test
+          # terraform-init-additional-args:
+          # terraform-validate:
+          # terraform-version:
+          # tflint-version:
+          # tflint-provider:
+          # tflint-additional-args:
+          # tfsec-version:
+          # tfsec-additional-args:
+          # snyk-version:
+          # snyk-token:
+          # snyk-organization:
+          # snyk-additional-args:
+          # trivy-version:
+          # checkov-version:
+          # checkov-additional-args:
+          # terrascan-version:
+          # terrascan-init-args:
+          # terrascan-iac-type:
+          # terrascan-policy-type:
+          # terrascan-custom-scan-args:
+          # driftctl-version:
+          # driftctl-additional-args:
+          # infracost-version:
+          # infracost-api-key:
+          # infracost-additional-args:
+          before-static-analysis:
+            - before-job-message:
+                msg: Hello, before!
+          after-static-analysis:
+            - after-job-message:
+                msg: Hello, after!
