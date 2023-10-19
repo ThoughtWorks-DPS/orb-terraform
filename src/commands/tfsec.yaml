@@ -11,13 +11,13 @@ parameters:
     default: '.'
 
   tfsec-additional-args:
-    description: optional override of default directory and flags
+    description: optional additional flags
     type: string
     default: ""
 
 steps:
   - run:
-      name: Run tfsec with optional override
+      name: Run tfsec with optional parameters
       working_directory: << parameters.working-directory >>
       command: |
         tfsec --version
