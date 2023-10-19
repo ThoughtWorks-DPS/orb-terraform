@@ -55,7 +55,7 @@ workflows:
 
       - terraform/static-analysis:
           working-directory: test
-          tflint-version: Installed
+          tflint-version: installed
           tflint-provider: aws
           # tflint-additional-args:
           # tfsec-version:
