@@ -69,11 +69,8 @@ workflows:
           # trivy requires tfplan.json
           checkov-version: installed
           checkov-additional-args: -d . --skip-check CKV_TF_1 
-          # terrascan-version:
-          # terrascan-init-args:
-          # terrascan-iac-type:
-          # terrascan-policy-type:
-          # terrascan-custom-scan-args:
+          terrascan-version: installed
+          terrascan-custom-scan-args: -t aws -i terraform --output=yaml --skip-rules="AC_AWS_0369"
           # driftctl-version:
           # driftctl-additional-args:
           # infracost-version:
