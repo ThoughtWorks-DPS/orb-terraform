@@ -66,9 +66,9 @@ workflows:
           snyk-version: installed
           snyk-organization: twdps
           snyk-additional-args: --report --target-name=orb-terraform-ci
-          # trivy-version:
-          # checkov-version:
-          # checkov-additional-args:
+          # trivy requires tfplan.json
+          checkov-version: installed
+          checkov-additional-args: -d . --skip-check CKV_TF_1 
           # terrascan-version:
           # terrascan-init-args:
           # terrascan-iac-type:

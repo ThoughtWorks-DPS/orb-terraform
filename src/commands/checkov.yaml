@@ -19,7 +19,7 @@ parameters:
   checkov-additional-args:
     description: optional additional flags to be passed to checkov
     type: string
-    default: ""
+    default: "-d ."
 
 steps:
   - when:
