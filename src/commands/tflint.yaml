@@ -44,7 +44,7 @@ steps:
                 echo "Provider not defined because .tflint.hcl already exists in working directory"
               fi
   - run:
-      name: lint terraform files
+      name: tflint scan of terraform files
       working_directory: << parameters.working-directory >>
       command: |
         tflint --version

@@ -58,8 +58,8 @@ workflows:
           tflint-version: installed
           tflint-provider: aws
           tflint-additional-args: --format=compact --force
-          # tfsec-version:
-          # tfsec-additional-args:
+          tfsec-version: installed
+          tfsec-additional-args: --exclude aws-ec2-no-excessive-port-access,aws-ec2-no-public-ingress-acl,aws-ec2-require-vpc-flow-logs-for-all-vpcs
           # snyk-version:
           # snyk-token:
           # snyk-organization:
