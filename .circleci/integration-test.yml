@@ -77,6 +77,8 @@ workflows:
           # infracost-api-key:
           # infracost-additional-args:
           before-static-analysis:
+            - terraform/packages:
+                terrascan-version: 1.18.3
             - before-job-message:
                 msg: Hello, before!
           after-static-analysis:
