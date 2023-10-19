@@ -347,4 +347,3 @@ steps:
       condition: << parameters.after-static-analysis >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.after-static-analysis >>
-
