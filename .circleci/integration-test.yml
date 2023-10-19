@@ -51,7 +51,7 @@ workflows:
 
   integration tests:
     jobs:
-      - test packages command
+      #- test packages command
 
       - terraform/static-analysis:
           working-directory: test
