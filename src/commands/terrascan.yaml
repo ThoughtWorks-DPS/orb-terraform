@@ -32,7 +32,7 @@ parameters:
     description: |
       Override default settings with any valid terrascan scan flags.
     type: string
-    default: "" 
+    default: ""
 
 steps:
   - run:

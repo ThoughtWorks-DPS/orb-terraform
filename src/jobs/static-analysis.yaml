@@ -112,7 +112,7 @@ parameters:
       option will not do anything if a .tflint.hcl file already exists
       within the repo. If you include a custom configuration file you must
       manage the provider plugin settings yourself. If you specify a
-      provider and also use additional-commands to define a custom 
+      provider and also use additional-commands to define a custom
       .tflint.hcl filename, this will result in .tflint.hcl and you
       customer file both existing.
     type: enum
@@ -126,7 +126,7 @@ parameters:
     type: string
     default: ""
 
-  tfsec-version: 
+  tfsec-version:
     description: |
       Providing a tflint version results in a tfsec scan of the repo using
       the desired version. Specify version "installed" to use the version

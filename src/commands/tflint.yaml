@@ -9,7 +9,6 @@ description: |
   - generates a .tflint.hcl config file to support the tflint-provider specified.
   - You can fully manage configuration by maintaining .tflint.hcl in your repo.
   - if you include a .tflint.hcl file, you specify a provider; e.g., plugin "aws" { enabled = true }.
-  - 
 
 parameters:
 
@@ -49,5 +48,5 @@ steps:
       working_directory: << parameters.working-directory >>
       command: |
         tflint --version
-        tflint --init 
+        tflint --init
         tflint << parameters.tflint-additional-args >>

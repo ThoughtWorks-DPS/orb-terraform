@@ -9,21 +9,6 @@ globals:
   - &context orb-publishing
   - &orb-name twdps/terraform
 
-# commands:
-#   assert-generated-file-against-expected:
-#     parameters:
-#       generated-file:
-#         type: string
-#     steps:
-#       - run:
-#           name: test sbxdev template file against expected
-#           command: |
-#             export result=$(cmp -s chart/overlays/compare-sbxdev.yaml << parameters.generated-file >>; echo $?)
-#             if [[ $result -ne 0 ]]; then
-#               echo "error: sbxdev-sample-app.yaml does not match expected output"
-#               exit 1
-#             fi
-
 jobs:
 
   test packages command:
