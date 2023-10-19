@@ -71,8 +71,8 @@ workflows:
           checkov-additional-args: -d . --skip-check CKV_TF_1 
           terrascan-version: installed
           terrascan-custom-scan-args: -t aws -i terraform --output=yaml --skip-rules="AC_AWS_0369"
-          # driftctl-version:
-          # driftctl-additional-args:
+          driftctl-version: installed
+          driftctl-additional-args: --help
           # infracost-version:
           # infracost-api-key:
           # infracost-additional-args:
