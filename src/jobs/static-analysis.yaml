@@ -194,6 +194,29 @@ parameters:
     type: string
     default: ""
 
+  terrascan-init-args:
+    description: Provide custom init command flags.
+    type: string
+    default: ""
+
+  terrascan-iac-type:
+    description: terrascan iac provider types.
+    type: enum
+    enum: ["arm", "cft", "docker", "helm", "k8s", "kustomize", "terraform", "tfplan", ""]
+    default: ""
+
+  terrascan-policy-type:
+    description: terrascan preset policy types. Default is all.
+    type: enum
+    enum: ["all", "aws", "azure", "docker", "gcp", "github", "k8s"]
+    default: "all"
+
+  terrascan-custom-scan-args:
+    description: |
+      Override default settings with any valid terrascan scan flags.
+    type: string
+    default: ""
+
   driftctl-version:
     description: |
       Providing a tflint version results in a driftctl scan of the repo using
@@ -202,11 +225,26 @@ parameters:
     type: string
     default: ""
 
+  driftctl-additional-args:
+    description: Provide flag options to scan command.
+    type: string
+    default: ""
+
   infracost-version:
     description: |
       Providing a tflint version results in a infracost scan of the repo using
       the desired version. Specify version "installed" to use the version
       already installed on the executor.
+    type: string
+    default: ""
+
+  infracost-api-key:
+    description: organization api key
+    type: env_var_name
+    default: INFRACOST_API_KEY
+
+  infracost-additional-args:
+    description: Provide flag options to scan command.
     type: string
     default: ""
 
@@ -248,11 +286,6 @@ steps:
       command: |
         terraform version
         terraform init << parameters.terraform-init-additional-args >>
-
-  # - terrascan
-  # - driftctl
-  # - infracost
-
   - when:
       name: perform tflint scan of terraform source files
       condition: << parameters.tflint-version >>
@@ -284,10 +317,34 @@ steps:
             snyk-token: << parameters.snyk-token >>
             snyk-organization: << parameters.snyk-organization >>
             snyk-additional-args: << parameters.snyk-additional-args >>
-
-
+  - when:
+      name: run terrascan on repository files
+      condition: << parameters.terrascan-version >>
+      steps:
+        - terrascan:
+            working-directory: << parameters.working-directory >>
+            terrascan-init-args: << parameters.terrascan-init-args >>
+            terrascan-iac-type: << parameters.terrascan-iac-type >>
+            terrascan-policy-type: << parameters.terrascan-policy-type >>
+            terrascan-custom-scan-args: << parameters.terrascan-custom-scan-args >>
+  - when:
+      name: run driftctl scan
+      condition: << parameters.driftctl-version >>
+      steps:
+        - driftctl:
+            working-directory: << parameters.working-directory >>
+            driftctl-additional-args: << parameters.driftctl-additional-args >>
+  - when:
+      name: run infracost analysis
+      condition: << parameters.infracost-version >>
+      steps:
+        - infracost:
+            working-directory: << parameters.working-directory >>
+            infracost-api-key: << parameters.infracost-api-key >>
+            infracost-additional-args: << parameters.infracost-additional-args >>
   - when:
       name: Run after-static-analysis lifecycle hook steps
       condition: << parameters.after-static-analysis >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.after-static-analysis >>
+

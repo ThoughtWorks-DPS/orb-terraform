@@ -1,0 +1,24 @@
+# src/commands/driftctl.yaml
+---
+
+description: Run driftctl state scan.
+
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+
+  driftctl-additional-args:
+    description: Provide flag options to scan command.
+    type: string
+    default: ""
+
+steps:
+  - run:
+      name: Run driftctl with additional optional args
+      working_directory: << parameters.working-directory >>
+      command: |
+        driftctl --version
+        driftctl << parameters.driftctl-additional-args >>

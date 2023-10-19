@@ -1,0 +1,29 @@
+# src/commands/infracost.yaml
+---
+
+description: Run infracost analysis.
+
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+
+  infracost-api-key:
+    description: organization api key
+    type: env_var_name
+    default: INFRACOST_API_KEY
+
+  infracost-additional-args:
+    description: Provide flag options to scan command.
+    type: string
+    default: ""
+
+steps:
+  - run:
+      name: Run infracost with additional args
+      working_directory: << parameters.working-directory >>
+      command: |
+        infracost --version
+        infracost << parameters.infracost-additional-args >>
