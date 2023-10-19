@@ -1,27 +1,15 @@
 terraform {
-  required_version = "~> 1.5"
+  required_version = "~> 1.6"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.7"
     }
   }
-
-  backend "remote" {
-    hostname     = "app.terraform.io"
-    organization = "twdps"
-    workspaces {
-      prefix = "psk-aws-platform-vpc-"
-    }
-  }
 }
 
 provider "aws" {
   region = var.aws_region
-  assume_role {
-    role_arn     = "arn:aws:iam::${var.aws_account_id}:role/${var.aws_assume_role}"
-    session_name = "psk-aws-platform-vpc-${var.instance_name}"
-  }
 
   default_tags {
     tags = {

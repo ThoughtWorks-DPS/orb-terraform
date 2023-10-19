@@ -274,18 +274,18 @@ steps:
       terrascan-version: << parameters.terrascan-version >>
       driftctl-version: << parameters.driftctl-version >>
       infracost-version: << parameters.infracost-version >>
-  - when:
-      name: perform terraform validate
-      condition: << parameters.terraform-validate >>
-      steps:
-        - validate:
-            working-directory: << parameters.working-directory >>
   - run:
       name: terraform init
       working_directory: << parameters.working-directory >>
       command: |
         terraform version
         terraform init << parameters.terraform-init-additional-args >>
+  - when:
+      name: perform terraform validate
+      condition: << parameters.terraform-validate >>
+      steps:
+        - validate:
+            working-directory: << parameters.working-directory >>
   - when:
       name: perform tflint scan of terraform source files
       condition: << parameters.tflint-version >>
