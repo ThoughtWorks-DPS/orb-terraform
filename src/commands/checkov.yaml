@@ -2,8 +2,7 @@
 # yamllint disable rule:line-length
 ---
 
-description: |
-  Basic checkov against terraform plan output json.
+description: Basic checkov scan of terraform plan output json.
 
 parameters:
 
@@ -11,13 +10,29 @@ parameters:
     description: specific folder in which to run the commands
     type: string
     default: '.'
+
+  terraform-plan-file:
+    description: specify terraform plan output file for targeted scan
+    type: string
+    default: ""
+
   checkov-additional-args:
     description: optional additional flags to be passed to checkov
     type: string
     default: ""
 
 steps:
-  - run:
-      name: Run checkov against terraform plan output json with optional additional args
+  - when:
+      condition: << parameters.terraform-plan-file >>
       working_directory: << parameters.working-directory >>
-      command: checkov -f tfplan.json << parameters.checkov-additional-args >>
+      steps:
+        - run:
+            name: checkov scan of terraform plan output file
+            command: checkov -f << parameters.terraform-plan-file >> << parameters.checkov-additional-args >>
+  - unless:
+      condition: << parameters.terraform-plan-file >>
+      working_directory: << parameters.working-directory >>
+      steps:
+        - run:
+            name: checkov scan of terraform plan output file
+            command: checkov << parameters.checkov-additional-args >>

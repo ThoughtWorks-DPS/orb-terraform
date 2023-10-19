@@ -1,0 +1,55 @@
+# src/commands/terrascan.yaml
+# yamllint disable rule:line-length
+---
+
+description: Perform terrascan policy evaluation. Server mode not supported.
+
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+
+  terrascan-init-args:
+    description: Provide custom init command flags.
+    type: string
+    default: ""
+
+  terrascan-iac-type:
+    description: terrascan iac provider types.
+    type: enum
+    enum: ["arm", "cft", "docker", "helm", "k8s", "kustomize", "terraform", "tfplan", ""]
+    default: ""
+
+  terrascan-policy-type:
+    description: terrascan preset policy types. Default is all.
+    type: enum
+    enum: ["all", "aws", "azure", "docker", "gcp", "github", "k8s"]
+    default: "all"
+
+  terrascan-custom-scan-args:
+    description: |
+      Override default settings with any valid terrascan scan flags.
+    type: string
+    default: "" 
+
+steps:
+  - run:
+      name: terrascan init
+      working_directory: << parameters.working-directory >>
+      command: terrascan init << parameters.terrascan-init-args >>
+  - unless:
+      condition: << parameters.terrascan-custom-scan-args >>
+      working_directory: << parameters.working-directory >>
+      steps:
+        - run:
+            name: terrascan scan
+            command: terrascan scan -i << parameters.terrascan-iac-type >> -t << parameters.terrascan-policy-type >>
+  - when:
+      condition: << parameters.terrascan-custom-scan-args >>
+      working_directory: << parameters.working-directory >>
+      steps:
+        - run:
+            name: terrascan scan
+            command: terrascan scan << parameters.terrascan-custom-scan-args >>

@@ -6,7 +6,8 @@ description: |
   Install specified package versions on executor for orb dependencies.
   This is optional with the use of a twdps/circleci-infra convenience
   image. Each package-version parameter below can be used to install
-  a specific version of the named package.
+  a specific version of the named package. If left blank or defined as
+  "installed", the command will not attempt to install anything
 
   Supported packagesL
   - terraform validate (default)
@@ -72,7 +73,16 @@ parameters:
 
 steps:
   - when:
-      condition: << parameters.terraform-version >>
+      condition:
+        and:
+          - not:
+              matches:
+                pattern: "^installed$"
+                value: << parameters.terraform-version >>
+          - not:
+              matches:
+                pattern: "^$"
+                value: << parameters.terraform-version >>
       steps:
         - run:
             name: install terraform version << parameters.terraform-version >>
@@ -80,7 +90,16 @@ steps:
               TERRAFORM_VERSION: << parameters.terraform-version >>
             command: <<include(scripts/install_terraform.sh)>>
   - when:
-      condition: << parameters.tflint-version >>
+      condition:
+        and:
+          - not:
+              matches:
+                pattern: "^installed$"
+                value: << parameters.tflint-version >>
+          - not:
+              matches:
+                pattern: "^$"
+                value: << parameters.tflint-version >>
       steps:
         - run:
             name: install tflint version << parameters.tflint-version >>
@@ -88,7 +107,16 @@ steps:
               TFLINT_VERSION: << parameters.tflint-version >>
             command: <<include(scripts/install_tflint.sh)>>
   - when:
-      condition: << parameters.tfsec-version >>
+      condition:
+        and:
+          - not:
+              matches:
+                pattern: "^installed$"
+                value: << parameters.tfsec-version >>
+          - not:
+              matches:
+                pattern: "^$"
+                value: << parameters.tfsec-version >>
       steps:
         - run:
             name: install tfsec version << parameters.tfsec-version >>
@@ -96,7 +124,16 @@ steps:
               TFSEC_VERSION: << parameters.tfsec-version >>
             command: <<include(scripts/install_tfsec.sh)>>
   - when:
-      condition: << parameters.trivy-version >>
+      condition:
+        and:
+          - not:
+              matches:
+                pattern: "^installed$"
+                value: << parameters.trivy-version >>
+          - not:
+              matches:
+                pattern: "^$"
+                value: << parameters.trivy-version >>
       steps:
         - run:
             name: install trivy version << parameters.trivy-version >>
@@ -104,7 +141,16 @@ steps:
               TRIVY_VERSION: << parameters.trivy-version >>
             command: <<include(scripts/install_trivy.sh)>>
   - when:
-      condition: << parameters.checkov-version >>
+      condition:
+        and:
+          - not:
+              matches:
+                pattern: "^installed$"
+                value: << parameters.checkov-version >>
+          - not:
+              matches:
+                pattern: "^$"
+                value: << parameters.checkov-version >>
       steps:
         - run:
             name: install checkov version << parameters.checkov-version >>
@@ -112,7 +158,16 @@ steps:
               sudo pip install --no-cache-dir --break-system-packages checkov==<< parameters.checkov-version >>
               checkov --version
   - when:
-      condition: << parameters.snyk-version >>
+      condition:
+        and:
+          - not:
+              matches:
+                pattern: "^installed$"
+                value: << parameters.snyk-version >>
+          - not:
+              matches:
+                pattern: "^$"
+                value: << parameters.snyk-version >>
       steps:
         - run:
             name: install snyk version << parameters.snyk-version >>
@@ -120,7 +175,16 @@ steps:
               SNYK_VERSION: << parameters.snyk-version >>
             command: <<include(scripts/install_snyk.sh)>>
   - when:
-      condition: << parameters.terrascan-version >>
+      condition:
+        and:
+          - not:
+              matches:
+                pattern: "^installed$"
+                value: << parameters.terrascan-version >>
+          - not:
+              matches:
+                pattern: "^$"
+                value: << parameters.terrascan-version >>
       steps:
         - run:
             name: install terrascan version << parameters.terrascan-version >>
@@ -128,18 +192,27 @@ steps:
               TERRASCAN_VERSION: << parameters.terrascan-version >>
             command: <<include(scripts/install_terrascan.sh)>>
   - when:
-      condition: << parameters.driftctl-version >>
+      condition:
+        and:
+          - not:
+              matches:
+                pattern: "^installed$"
+                value: << parameters.driftctl-version >>
+          - not:
+              matches:
+                pattern: "^$"
+                value: << parameters.driftctl-version >>
       steps:
         - run:
             name: install driftctl version << parameters.driftctl-version >>
             environment:
               DRIFTCTL_VERSION: << parameters.driftctl-version >>
             command: <<include(scripts/install_driftctl.sh)>>
-  - when:
-      condition: << parameters.infracost-version >>
-      steps:
-        - run:
-            name: install infracost version << parameters.infracost-version >>
-            environment:
-              INFRACOST_VERSION: << parameters.infracost-version >>
-            command: <<include(scripts/install_infracost.sh)>
+  # - when:
+  #     condition: << parameters.infracost-version >>
+  #     steps:
+  #       - run:
+  #           name: install infracost version << parameters.infracost-version >>
+  #           environment:
+  #             INFRACOST_VERSION: << parameters.infracost-version >>
+  #           command: <<include(scripts/install_infracost.sh)>

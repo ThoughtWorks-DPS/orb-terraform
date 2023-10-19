@@ -71,87 +71,142 @@ parameters:
     type: string
     default: /bin/bash -eo pipefail
 
+  terraform-init-additional-args:
+    description: |
+      Include any additional terraform init command arguments.
+      Default is -backend=false.
+    type: string
+    default: -backend=false
 
   terraform-validate:
     description: |
       Validate runs checks that verify whether a configuration is syntactically
-      valid and internally consistent, regardless of any provided variables or
-      existing state. It is thus primarily useful for general verification of
-      reusable modules, including correctness of attribute names and value types.
+      valid, internally consistent, and canonically formatted regardless of any
+      provided variables or existing state. It is thus primarily useful for
+      general verification of reusable modules, including correctness of
+      attribute names and value types.
     type: boolean
     default: true
 
-  tflint:
+  terraform-version:
     description: |
-      perform tflint of terraform files.
-    type: boolean
-    default: true
-
-  tflint-version:
-    description: optional override to a specific release version of tflint
-    type: string
-    default: 'latest'
-
-  tflint-provider:
-    description: provider for tflint plugin
-    type: enum
-    enum: ["aws", "azurerm", "google"]
-    default: aws
-
-  # checkov:
-  checkov-version:
-    description: optional override to a specific release version of checkov
+      If you specify a specific version, it will be installed and used by
+      all orb terraform functions. Leave blank or specify version "installed"
+      to use the version already installed on the executor.
     type: string
     default: ""
 
-  checkov-scan:
-    description: perform checkov scan of source code
-    type: boolean
-    default: true
+  tflint-version:
+    description: |
+      Providing a tflint version results in a tflint scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
+    type: string
+    default: ""
+
+  tflint-provider:
+    description: |
+      Specify a cloud provider to use for tflint rulesets. "aws", "azurerm",
+      "google" are the supported providers. Specifying a selection will
+      result in a matching .tflint.hcl configuration being created. This
+      option will not do anything if a .tflint.hcl file already exists
+      within the repo. If you include a custom configuration file you must
+      manage the provider plugin settings yourself. If you specify a
+      provider and also use additional-commands to define a custom 
+      .tflint.hcl filename, this will result in .tflint.hcl and you
+      customer file both existing.
+    type: enum
+    enum: ["aws", "azurerm", "google", ""]
+    default: ""
+
+  tflint-additional-args:
+    description: |
+      Include any additional tflint commandline arguments. Note: not all
+      options can be successfully used in a pipeline.
+    type: string
+    default: ""
+
+  tfsec-version: 
+    description: |
+      Providing a tflint version results in a tfsec scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
+    type: string
+    default: ""
+
+  tfsec-additional-args:
+    description: |
+      Include any additional tfsec commandline arguments. Note: not all
+      options have been tested in pipeline setting.
+    type: string
+    default: ""
+
+  snyk-version:
+    description: |
+      Providing a tflint version results in a snyk scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
+    type: string
+    default: ""
+
+  snyk-token:
+    description: |
+      Name of env var containing your Snyk API token. Default is SNYK_TOKEN.
+    type: env_var_name
+    default: SNYK_TOKEN
+
+  snyk-organization:
+    description: Snyk organization to reference.
+    type: string
+    default: ""
+
+  snyk-additional-args:
+    description: Optional additional flags to be passed to Snyk IaC.
+    type: string
+    default: ""
+
+  trivy-version:
+    description: |
+      Providing a tflint version results in a trivy scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
+    type: string
+    default: ""
+
+  checkov-version:
+    description: |
+      Providing a tflint version results in a checkov scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
+    type: string
+    default: ""
 
   checkov-additional-args:
     description: optional additional flags to be passed to checkov
     type: string
     default: ""
 
-  snyk-version:
-    description: optional override to a specific release version of snyk
-    type: string
-    default: ""
-
-  snyk-scan:
-    description: perform Snyk scan of source code
-    type: boolean
-    default: true
-
-  tfsec-scan:
-    description: perform tfsec scan of terraform source files
-    type: boolean
-    default: true
-
-  tfsec-additional-args:
-    description: optional override of default tfsec parameters
-    type: string
-    default: ""
-
-  tfsec-version:
-    description: optional override to a specific release version of tfsec
-    type: string
-    default: ""
-
-  snyk-organization:
-    description: the Snyk organization to reference
-    type: string
-    default: ""
-
-  snyk-additional-args:
-    description: optional additional flags to be passed to Snyk IaC
-    type: string
-    default: ""
-
-  backend-conf:
+  terrascan-version:
     description: |
-      additional terraform init parameters to configure backend.conf if necessary
+      Providing a tflint version results in a terrascan scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
+    type: string
+    default: ""
+
+  driftctl-version:
+    description: |
+      Providing a tflint version results in a driftctl scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
+    type: string
+    default: ""
+
+  infracost-version:
+    description: |
+      Providing a tflint version results in a infracost scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
     type: string
     default: ""
 
@@ -173,52 +228,64 @@ steps:
       condition: << parameters.before-static-analysis >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-static-analysis >>
-  # - setup-packages:
-  #     snyk-version: << parameters.snyk-version >>
-  #     checkov-version: << parameters.checkov-version >>
-  #     tfsec-version: << parameters.tfsec-version >>
-  # - when:
-  #     name: run tflint
-  #     condition: << parameters.lint-terraform >>
-  #     steps:
-  #       - tflint:
-  #           working-directory: << parameters.working-directory >>
-  #           tflint-version: << parameters.tflint-version >>
-  #           tflint-provider: << parameters.tflint-provider >>
-  # - run:
-  #     name: terraform init
-  #     working_directory: << parameters.working-directory >>
-  #     command: |
-  #       terraform version
-  #       terraform init -backend=false <<#parameters.backend-conf>> << parameters.backend-conf >> <</parameters.backend-conf>>
-  # - when:
-  #     name: perform tfsec scan of terraform source files
-  #     condition: << parameters.tfsec-scan >>
-  #     steps:
-  #       - tfsec:
-  #           working-directory: << parameters.working-directory >>
-  #           tfsec-additional-args: << parameters.tfsec-additional-args >>
-  # - when:
-  #     name: run Snyk IaC inspection of TF source files
-  #     condition: << parameters.snyk-scan >>
-  #     steps:
-  #       - snyk-static:
-  #           working-directory: << parameters.working-directory >>
-  #           organization: << parameters.snyk-organization >>
-  #           snyk-additional-args: << parameters.snyk-additional-args >>
-  # - when:
-  #     name: run checkov inspection of terraform source files
-  #     condition: << parameters.checkov-scan >>
-  #     steps:
-  #       - checkov-static:
-  #           working-directory: << parameters.working-directory >>
-  #           checkov-additional-args: << parameters.checkov-additional-args >>
+  - packages:
+      tflint-version: << parameters.tflint-version >>
+      tfsec-version: << parameters.tfsec-version >>
+      checkov-version: << parameters.checkov-version >>
+      snyk-version: << parameters.snyk-version >>
+      terrascan-version: << parameters.terrascan-version >>
+      driftctl-version: << parameters.driftctl-version >>
+      infracost-version: << parameters.infracost-version >>
   - when:
       name: perform terraform validate
       condition: << parameters.terraform-validate >>
       steps:
         - validate:
             working-directory: << parameters.working-directory >>
+  - run:
+      name: terraform init
+      working_directory: << parameters.working-directory >>
+      command: |
+        terraform version
+        terraform init << parameters.terraform-init-additional-args >>
+
+  # - terrascan
+  # - driftctl
+  # - infracost
+
+  - when:
+      name: perform tflint scan of terraform source files
+      condition: << parameters.tflint-version >>
+      steps:
+        - tflint:
+            working-directory: << parameters.working-directory >>
+            tflint-provider: << parameters.tflint-provider >>
+            tflint-additional-args: << parameters.tflint-additional-args >>
+  - when:
+      name: perform tfsec scan of terraform source files
+      condition: << parameters.tfsec-version >>
+      steps:
+        - tfsec:
+            working-directory: << parameters.working-directory >>
+            tfsec-additional-args: << parameters.tfsec-additional-args >>
+  - when:
+      name: run checkov scan of terraform source files
+      condition: << parameters.checkov-version >>
+      steps:
+        - checkov:
+            working-directory: << parameters.working-directory >>
+            checkov-additional-args: << parameters.checkov-additional-args >>
+  - when:
+      name: run Snyk IaC scan of terraform source files
+      condition: << parameters.snyk-version >>
+      steps:
+        - snyk:
+            working-directory: << parameters.working-directory >>
+            snyk-token: << parameters.snyk-token >>
+            snyk-organization: << parameters.snyk-organization >>
+            snyk-additional-args: << parameters.snyk-additional-args >>
+
+
   - when:
       name: Run after-static-analysis lifecycle hook steps
       condition: << parameters.after-static-analysis >>

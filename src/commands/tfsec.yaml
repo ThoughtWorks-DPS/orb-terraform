@@ -1,8 +1,7 @@
 # src/commands/tfsec.yaml
 ---
 
-description: |
-  Run tfsec against current working directory.
+description: Run tfsec against current working directory.
 
 parameters:
 
@@ -20,4 +19,6 @@ steps:
   - run:
       name: Run tfsec with optional override
       working_directory: << parameters.working-directory >>
-      command: tfsec << parameters.tfsec-additional-args >>
+      command: |
+        tfsec --version
+        tfsec << parameters.tfsec-additional-args >>

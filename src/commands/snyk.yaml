@@ -2,8 +2,7 @@
 # yamllint disable rule:line-length
 ---
 
-description: |
-  Snyk IaC static scan against terraform plan output json.
+description: Snyk IaC scan of terraform source files
 
 parameters:
 
@@ -11,29 +10,43 @@ parameters:
     description: specific folder in which to run the commands
     type: string
     default: '.'
-  token-variable:
+
+  snyk-token:
     description: >
-      Name of env var containing your Snyk API token. Pass this as a raw string such as CICD_SNYK_TOKEN.
-      Do not paste the actual token into your configuration.
-      If omitted it's assumed the CLI has already been setup with a valid token beforehand.
+      Name of env var containing your Snyk API token.
+      Default is SNYK_TOKEN.
     type: env_var_name
     default: SNYK_TOKEN
-  organization:
-    description: >
-      Name of the Snyk organisation name, under which this project should be tested and monitored
-      If omitted the default organization will be used.
+
+  snyk-organization:
+    description: Snyk organisation name.
     type: string
     default: ""
+
+  terraform-plan-file:
+    description: specify terraform plan output file for targeted scan
+    type: string
+    default: ""
+
   snyk-additional-args:
     description: optional additional flags to be passed to Snyk IaC
     type: string
     default: ""
 
 steps:
-  - run:
-      name: Run Snyk iac against terraform plan output json with optional additional args
+  - when:
+      condition: << parameters.terraform-plan-file >>
       working_directory: << parameters.working-directory >>
-      command: >
-        snyk iac test tfplan.json
-        <<#parameters.organization>>--org=<<parameters.organization>><</parameters.organization>>
-        << parameters.snyk-additional-args >>
+      steps:
+        - run:
+            name: Run Snyk iac against terraform plan output json
+            command: |
+              snyk iac test --org=<<parameters.snyk-organization>> << parameters.snyk-additional-args >> << parameters.terraform-plan-file >>
+  - unless:
+      condition: << parameters.terraform-plan-file >>
+      working_directory: << parameters.working-directory >>
+      steps:
+        - run:
+            name: Run Snyk iac against terraform source files
+            command: |
+              snyk iac test --org=<<parameters.snyk-organization>> << parameters.snyk-additional-args >> .
