@@ -7,7 +7,7 @@ description: |
   This is optional with the use of a twdps/circleci-infra convenience
   image. Each package-version parameter below can be used to install
   a specific version of the named package. If left blank or defined as
-  "installed", the command will not attempt to install anything
+  "installed", the command will not attempt to install anything.
 
   Supported packagesL
   - terraform validate (default)
@@ -19,7 +19,10 @@ description: |
   - driftctl
   - infracost
 
-  Note: When using your own custom executor, keep in mind that various
+  Note: When using "installed" as package version, caplitalization
+  is important.
+  
+  When using your own custom executor, keep in mind that various
   package management dependencies will be required, and the install
   will use sudo since it assumes the executor container is running as
   a defined USER.

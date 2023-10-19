@@ -19,6 +19,8 @@ variable "instance_name" {
   type        = string
 }
 
+variable "aws_assume_role" { type = string }
+
 variable "vpc_cidr" {
   type = string
   validation {
