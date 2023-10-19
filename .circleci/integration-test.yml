@@ -57,7 +57,7 @@ workflows:
           working-directory: test
           tflint-version: installed
           tflint-provider: aws
-          tflint-additional-args: --format=compact
+          tflint-additional-args: --format=compact --force
           # tfsec-version:
           # tfsec-additional-args:
           # snyk-version:
