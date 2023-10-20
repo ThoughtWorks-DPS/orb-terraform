@@ -78,6 +78,7 @@ workflows:
           before-static-analysis:
             - terraform/packages:
                 terrascan-version: 1.18.3
+                infracost-version: 0.10.29
             - before-job-message:
                 msg: Hello, before!
           after-static-analysis:
