@@ -20,5 +20,5 @@ steps:
       name: Run driftctl with additional optional args
       working_directory: << parameters.working-directory >>
       command: |
-        driftctl --version
+        driftctl version
         driftctl << parameters.driftctl-additional-args >>
