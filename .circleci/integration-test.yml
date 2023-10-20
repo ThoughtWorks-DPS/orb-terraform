@@ -73,9 +73,8 @@ workflows:
           terrascan-custom-scan-args: -t aws -i terraform --output=yaml -d test/ --skip-rules="AC_AWS_0369"
           driftctl-version: installed
           driftctl-additional-args: --help
-          # infracost-version:
-          # infracost-api-key:
-          # infracost-additional-args:
+          infracost-version: installed
+          infracost-additional-args: breakdown --path .
           before-static-analysis:
             - terraform/packages:
                 terrascan-version: 1.18.3
