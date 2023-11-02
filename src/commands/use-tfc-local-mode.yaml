@@ -1,0 +1,32 @@
+# src/commands/create-tfc-workspace.yaml
+# yamllint disable rule:line-length
+---
+description: |
+  Used with terraform cloud. Checks for a terraform cloud workspace. If it does
+  not exist, it will be created as a local-execution mode workspace.
+
+parameters:
+
+  tfe-token:
+    description: terraform team-api token. Uses $TFE_TOKEN by default
+    type: string
+    default: $TFE_TOKEN
+
+  tfc-organization:
+    description: terraform cloud organization Name
+    type: string
+    default: ""
+
+  tfc-workspace:
+    description: Create and/or set local-mode workspace
+    type: string
+    default: ""
+
+steps:
+  - run:
+      name: Confirm tfcloud workspace and local mode
+      environment:
+        TFE_TOKEN: << parameters.tfe-token >>
+        TFC_ORGANIZATION: << parameters.tfc-organization >>
+        TFC_WORKSPACE: << parameters.tfc-workspace >>
+      command: <<include(scripts/confirm_tfc_workspace.sh)>>

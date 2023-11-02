@@ -29,6 +29,13 @@ commands:
       - run:
           name: echo after-msg param
           command: echo "after - << parameters.msg >>"
+
+  add-for-plan-test:
+    steps:
+      - run:
+          name: reconfigure versions.tf fixture for plan test
+          command: |
+          
 jobs:
 
   test packages command:
@@ -63,6 +70,7 @@ workflows:
           tflint-additional-args: --format=compact --force
           tfsec-version: installed
           tfsec-additional-args: --exclude aws-ec2-no-excessive-port-access,aws-ec2-no-public-ingress-acl,aws-ec2-require-vpc-flow-logs-for-all-vpcs
+          trivy-version: installed
           snyk-version: installed
           snyk-organization: twdps
           snyk-additional-args: --report --target-name=orb-terraform-ci
@@ -79,8 +87,33 @@ workflows:
             - terraform/packages:
                 terrascan-version: 1.18.3
                 infracost-version: 0.10.29
+                trivy-version: 0.46.0
             - before-job-message:
                 msg: Hello, before!
           after-static-analysis:
             - after-job-message:
                 msg: Hello, after!
+
+      # - terraform/plan:
+      #     context: *context
+      #     shell: *shell
+      #     working-directory: test
+      #     workspace: orb-terraform
+      #     terraform-var-file: varfile-check.tfvars
+      #     terraform-plan-outfile: filename-check.json
+      #     snyk-version: installed
+      #     snyk-organization: twdps
+      #     checkov-version: installed
+      #     trivy-version: installed
+      #     tfc-workspace: orb-terraform-test
+      #     tfc-organization: twdps
+      #     before-terraform:
+      #       - add-for-plan-test
+      #       - before-job-message:
+      #           msg: Hello, before!
+      #     after-terraform-init:
+      #       - after-job-message:
+      #           msg: Hello, after init!
+      #     after-terraform:
+      #       - after-job-message:
+      #           msg: Hello, after!

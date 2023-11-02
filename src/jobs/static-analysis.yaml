@@ -71,13 +71,6 @@ parameters:
     type: string
     default: /bin/bash -eo pipefail
 
-  terraform-init-additional-args:
-    description: |
-      Include any additional terraform init command arguments.
-      Default is -backend=false.
-    type: string
-    default: -backend=false
-
   terraform-validate:
     description: |
       Validate runs checks that verify whether a configuration is syntactically
@@ -95,6 +88,13 @@ parameters:
       to use the version already installed on the executor.
     type: string
     default: ""
+
+  terraform-init-additional-args:
+    description: |
+      Include any additional terraform init command arguments.
+      Default is -backend=false.
+    type: string
+    default: -backend=false
 
   tflint-version:
     description: |
@@ -141,6 +141,20 @@ parameters:
     type: string
     default: ""
 
+  trivy-version:
+    description: |
+      Providing a trivy version results in a trivy scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
+    type: string
+    default: ""
+
+  trivy-commandline-args:
+    description: |
+      Provide trivy commandline arguments. Default is 'config . --exit code 1'
+    type: string
+    default: ""
+
   snyk-version:
     description: |
       Providing a tflint version results in a snyk scan of the repo using
@@ -162,14 +176,6 @@ parameters:
 
   snyk-additional-args:
     description: Optional additional flags to be passed to Snyk IaC.
-    type: string
-    default: ""
-
-  trivy-version:
-    description: |
-      Providing a tflint version results in a trivy scan of the repo using
-      the desired version. Specify version "installed" to use the version
-      already installed on the executor.
     type: string
     default: ""
 
@@ -269,6 +275,7 @@ steps:
   - packages:
       tflint-version: << parameters.tflint-version >>
       tfsec-version: << parameters.tfsec-version >>
+      trivy-version: << parameters.trivy-version >>
       checkov-version: << parameters.checkov-version >>
       snyk-version: << parameters.snyk-version >>
       terrascan-version: << parameters.terrascan-version >>
@@ -301,6 +308,13 @@ steps:
         - tfsec:
             working-directory: << parameters.working-directory >>
             tfsec-additional-args: << parameters.tfsec-additional-args >>
+  - when:
+      name: perform trivy scan of terraform source files
+      condition: << parameters.tfsec-version >>
+      steps:
+        - trivy:
+            working-directory: << parameters.working-directory >>
+            trivy-commandline-args: << parameters.trivy-commandline-args >>
   - when:
       name: run checkov scan of terraform source files
       condition: << parameters.checkov-version >>

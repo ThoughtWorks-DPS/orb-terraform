@@ -16,7 +16,6 @@ provider "aws" {
       env                                          = var.instance_name
       cluster                                      = var.instance_name
       pipeline                                     = "psk-aws-platform-vpc"
-      "kubernetes.io/cluster/${var.instance_name}" = "shared"
     }
   }
 }

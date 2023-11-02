@@ -70,107 +70,87 @@ parameters:
     default: /bin/sh -eo pipefail
 
   terraform-version:
-    description: must provide the release version of terraform
+    description: |
+      If you specify a specific version, it will be installed and used by
+      all orb terraform functions. Leave blank or specify version "installed"
+      to use the version already installed on the executor.
     type: string
     default: ""
 
-  tflint-version:
-    description: optional override to a specific release version of tflint
-    type: string
-    default: 'latest'
-
-  tflint-provider:
-    description: provider for tflint plugin
-    type: enum
-    enum: ["aws", "azurerm", "google"]
-    default: aws
-
-  lint-terraform:
+  terraform-init-additional-args:
     description: |
-      perform tflint of terraform files. Both this parameter and `static-analysis` must be set to `true` for linting to occur
-    type: boolean
-    default: true
+      Include any additional terraform init command arguments.
+      Default is -backend=false.
+    type: string
+    default: -backend=false
+
+  terraform-plan-additional-args:
+    description:  |
+      Include any additional terraform plan command arguments. Can be used in conjunction with
+      terraform-var-file parameter or an override.
+    type: string
+    default: ""
+
+  terraform-var-file:
+    description: Include terraform -var-file parameter
+    type: string
+    default: ""
+
+  terraform-plan-outfile:
+    description: Filename for plan results
+    type: string
+    default: tfplan.json
+
+  snyk-version:
+    description: |
+      Providing a tflint version results in a snyk scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
+    type: string
+    default: ""
+
+  snyk-token:
+    description: |
+      Name of env var containing your Snyk API token. Default is SNYK_TOKEN.
+    type: env_var_name
+    default: SNYK_TOKEN
+
+  snyk-organization:
+    description: Snyk organization to reference.
+    type: string
+    default: ""
+
+  snyk-additional-args:
+    description: Optional additional flags to be passed to Snyk IaC.
+    type: string
+    default: ""
 
   checkov-version:
-    description: optional override to a specific release version of checkov
+    description: |
+      Providing a tflint version results in a checkov scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
     type: string
     default: ""
-
-  checkov-scan:
-    description: |
-      perform checkov scan of terraform plan. Both this parameter and `static-analysis` must be set to `true` for checkov to run
-    type: boolean
-    default: true
 
   checkov-additional-args:
     description: optional additional flags to be passed to checkov
     type: string
     default: ""
 
-  snyk-version:
-    description: optional override to a specific release version of snyk
-    type: string
-    default: ""
-
-  snyk-scan:
-    description: perform Snyk scan of source code
-    type: boolean
-    default: false
-
-  snyk-organization:
-    description: the Snyk organization to reference
-    type: string
-    default: ""
-
-  tfsec-scan:
+  trivy-version:
     description: |
-      perform tfsec scan of terraform files. Both this parameter and `static-analysis` must be set to `true` for tfscan to occur
-    type: boolean
-    default: true
-
-  tfsec-additional-args:
-    description: optional override of default tfsec parameters
+      
     type: string
     default: ""
 
-  tfsec-version:
-    description: optional override to a specific release version of tfsec
+  tfc-workspace:
+    description: Used for workspace 'creation' workflow
     type: string
     default: ""
-
-  validate-terraform-fmt:
-    description: |
-      perform terraform fmt and validate. Both this parameter and `static-analysis` must be set to `true` for validation to occur
-    type: boolean
-    default: true
-
-  var-file:
-    description: terraform variable file to include in plan
-    type: string
-    default: ""
-
-  extra-terraform-args:
-    description: additional command line arguements for terraform plan
-    type: string
-    default: ""
-
-  backend-conf:
-    description: additional terraform init parameters to configure backend.conf if necessary
-    type: string
-    default: ""
-
-  tfc-local-execution-mode:
-    description: Confirm or Create the associated tfc-workspace-name in local-execution-mode for tfc-organization.
-    type: boolean
-    default: false
 
   tfc-organization:
     description: name of terraform cloud organization
-    type: string
-    default: ""
-
-  tfc-workspace-name:
-    description: Used for workspace 'creation' workflow
     type: string
     default: ""
 
@@ -194,12 +174,6 @@ parameters:
     type: steps
     default: []
 
-  static-analysis:
-    description: |
-      Run all static steps. When set to false, prevents all static analysis tasks from running (tflint, checkov, tfsec, tf fmt, tf validate).
-      You may be interested in the separate `static-analysis` job for performing these tasks.
-    type: boolean
-    default: true
 
 steps:
   - checkout
@@ -210,96 +184,65 @@ steps:
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-terraform >>
   - packages:
-      snyk-version: << parameters.snyk-version >>
       terraform-version: << parameters.terraform-version >>
       checkov-version: << parameters.checkov-version >>
-      tfsec-version: << parameters.tfsec-version >>
-  - when:
-      name: run tflint
-      condition:
-        and:
-          - << parameters.static-analysis >>
-          - << parameters.lint-terraform >>
-      steps:
-        - tflint:
-            working-directory: << parameters.working-directory >>
-            tflint-version: << parameters.tflint-version >>
-            tflint-provider: << parameters.tflint-provider >>
+      snyk-version: << parameters.snyk-version >>
   - when:
       name: Confirm or Create tfcloud workspace in local-execute-mode
-      condition: << parameters.tfc-local-execution-mode >>
+      condition: << parameters.tfc-workspace >>
       steps:
-        - create-tfc-workspace:
+        - use-tfc-local-mode:
+            tfc-workspace: << parameters.tfc-workspace >>
             tfc-organization: << parameters.tfc-organization >>
-            tfc-workspace-name: << parameters.tfc-workspace-name >>
             tfe-token: << parameters.tfe-token >>
   - run:
       name: terraform init
       working_directory: << parameters.working-directory >>
       command: |
         terraform version
-        terraform init <<#parameters.backend-conf>> << parameters.backend-conf >> <</parameters.backend-conf>>
-  - when:
-      name: perform tfsec scan of terraform files
-      condition:
-        and:
-          - << parameters.static-analysis >>
-          - << parameters.tfsec-scan >>
-      steps:
-        - tfsec:
-            working-directory: << parameters.working-directory >>
-            tfsec-additional-args: << parameters.tfsec-additional-args >>
-  - when:
-      name: run terraform validate
-      condition:
-        and:
-          - << parameters.static-analysis >>
-          - << parameters.validate-terraform-fmt >>
-      steps:
-        - validate:
-            working-directory: << parameters.working-directory >>
+        terraform init << parameters.terraform-init-additional-args >>
   - when:
       name: Run after-terraform-init lifecycle hook steps
       condition: << parameters.after-terraform-init >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.after-terraform-init >>
+
   - run:
       name: terraform plan
       working_directory: << parameters.working-directory >>
-      command: terraform plan <<#parameters.var-file>> -var-file=<< parameters.var-file >> <</parameters.var-file>> <<#parameters.extra-terraform-args>> << parameters.extra-terraform-args >> <</parameters.extra-terraform-args>> --out tfplan.binary
+      command: |
+        terraform plan \
+          <<#parameters.terraform-var-file>> -var-file=<< parameters.terraform-var-file >> <</parameters.terraform-var-file>> \
+          <<#parameters.terraform-plan-additional-args>> << parameters.terraform-plan-additional-args >> <</parameters.terraform-plan-additional-args>> \
+          --out tfplan.binary
+          terraform show -json tfplan.binary | jq '.' > << parameters.terraform-plan-outfile >>
+
   - when:
-      name: generate terraform plan as json for security tools
-      condition:
-        or:
-          - and:
-              - << parameters.static-analysis >>
-              - << parameters.checkov-scan >>
-          - and:
-              - << parameters.static-analysis >>
-              - << parameters.snyk-scan >>
-      steps:
-        - generate-terraform-json:
-            working-directory: << parameters.working-directory >>
-  - when:
-      name: run checkov inspection of terraform plan output
-      condition:
-        and:
-          - << parameters.static-analysis >>
-          - << parameters.checkov-scan >>
+      name: run checkov scan of terraform source and plan outfile
+      condition: << parameters.checkov-version >>
       steps:
         - checkov:
             working-directory: << parameters.working-directory >>
+            terraform-plan-outfile: << parameters.terraform-plan-outfile >>
             checkov-additional-args: << parameters.checkov-additional-args >>
   - when:
-      name: run snyk inspection of terraform plan output
-      condition:
-        and:
-          - << parameters.static-analysis >>
-          - << parameters.snyk-scan >>
+      name: run Snyk IaC scan of terraform source and plan outfile
+      condition: << parameters.snyk-version >>
       steps:
         - snyk:
             working-directory: << parameters.working-directory >>
-            organization: << parameters.snyk-organization >>
+            terraform-plan-outfile: << parameters.terraform-plan-outfile >>
+            snyk-token: << parameters.snyk-token >>
+            snyk-organization: << parameters.snyk-organization >>
+            snyk-additional-args: << parameters.snyk-additional-args >>
+  - when:
+      name: run Trivy iaC scan of terraform plan outfile
+      condition: << parameters.trivy-version >>
+      working-directory: << parameters.working-directory >>
+      steps:
+        - run:
+            name: run trivy scan of terraform plan outfile
+            command: trivy config ./<< parameters.terraform-plan-outfile >>
   - when:
       name: Run after-terraform lifecycle hook steps
       condition: << parameters.after-terraform >>

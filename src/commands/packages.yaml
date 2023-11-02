@@ -13,6 +13,7 @@ description: |
   - terraform validate (default)
   - tflint
   - tfsec
+  - trivy
   - checkov
   - snyk
   - terrascan

@@ -11,7 +11,7 @@ parameters:
     type: string
     default: '.'
 
-  terraform-plan-file:
+  terraform-plan-outfile:
     description: specify terraform plan output file for targeted scan
     type: string
     default: ""
@@ -23,14 +23,14 @@ parameters:
 
 steps:
   - when:
-      condition: << parameters.terraform-plan-file >>
+      condition: << parameters.terraform-plan-outfile >>
       working_directory: << parameters.working-directory >>
       steps:
         - run:
             name: checkov scan of terraform plan output file
-            command: checkov -f << parameters.terraform-plan-file >> << parameters.checkov-additional-args >>
+            command: checkov -f << parameters.terraform-plan-outfile >> << parameters.checkov-additional-args >>
   - unless:
-      condition: << parameters.terraform-plan-file >>
+      condition: << parameters.terraform-plan-outfile >>
       working_directory: << parameters.working-directory >>
       steps:
         - run:
