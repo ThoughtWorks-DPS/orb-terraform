@@ -273,6 +273,7 @@ steps:
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-static-analysis >>
   - packages:
+      terraform-version: << parameters.terraform-version >>
       tflint-version: << parameters.tflint-version >>
       tfsec-version: << parameters.tfsec-version >>
       trivy-version: << parameters.trivy-version >>

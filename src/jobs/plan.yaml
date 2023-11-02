@@ -7,19 +7,24 @@ description: >
 
   Includes the following optional customizations:
 
-  - set desired terraform version. Default is the version installed on the executor.
+  - set desired terraform version. Default is the version installed on the executor
+  - specify a working-directory, default is .
+  - select a terraform workspace, default is none
   - reference your own docker image executor. Default is twdps/circleci-infra-aws
   - set an executor resource-class, default is medium
   - set the executor shell process launch configuration, default is '/bin/sh -eo pipefail'
-  - set a desired version and provider for tflint, default is latest and aws
-  - set whether to perform checkov scan of plan output file and optionally specify release version to use and additional flags
-  - set whether to perform tfsec scan and optionally specify release version to use and additional flags
-  - specify a working-directory, default is .
-  - select a terraform workspace, default is none
-  - turn off terraform fmt and validate checks
+  - set a desired version and custom args for checkov and snyk scans of plan output
 
-  Keep in mind that latest or executor default versions will change. Pin terraform and tflint versions
-  to prevent if desired.
+  Note: Does not include full static code analysis hooks. Use the included
+  static-analysis job during the ci phase.
+
+  Note: The default executor image in this job is effectively set to Latest.
+  While this is efficient for orb development purposes, it is recommended
+  to always pin the executor version when using orbs in actual infrastructure
+  pipelines.
+
+  Note: Executor resources sizes 2xlarge and 2xlarge+ require review by
+  circleci support. Open a support ticket to request access.
 
 executor:
   name: circleci-infra-aws
@@ -35,12 +40,27 @@ shell: << parameters.shell >>
 parameters:
 
   working-directory:
-    description: specific folder in which to run the commands
+    description: Specific folder in which to run the commands.
     type: string
     default: '.'
 
   workspace:
-    description: set terraform workspace infrastructure environment
+    description: sSt terraform workspace infrastructure environment.
+    type: string
+    default: ""
+
+  tfc-workspace:
+    description: Create and/or set local-mode workspace
+    type: string
+    default: ""
+
+  tfe-token:
+    description: terraform team-api token. Uses $TFE_TOKEN by default
+    type: string
+    default: $TFE_TOKEN
+
+  tfc-organization:
+    description: terraform cloud organization Name
     type: string
     default: ""
 
@@ -50,12 +70,16 @@ parameters:
     default: docker.io/twdps/circleci-infra-aws:alpine-stable
 
   executor-registry-username:
-    description: Environment variable to reference as username for the registry specified by executor-image parameter
+    description: |
+      Environment variable to reference as username for the registry
+      specified by executor-image parameter
     type: env_var_name
     default: DOCKER_LOGIN
 
   executor-registry-password:
-    description: Environment variable to reference as password for the registry specified by executor-image parameter
+    description: |
+      Environment variable to reference as password for the registry
+      specified by executor-image parameter
     type: env_var_name
     default: DOCKER_PASSWORD
 
@@ -65,9 +89,11 @@ parameters:
     default: medium
 
   shell:
-    description: default shell invocation. Override to support different shells or tools like secrethub.io
+    description: |
+      default shell invocation. Override to support different shells or
+      tools like secrethub.io
     type: string
-    default: /bin/sh -eo pipefail
+    default: /bin/bash -eo pipefail
 
   terraform-version:
     description: |
@@ -95,9 +121,10 @@ parameters:
     description: Include terraform -var-file parameter
     type: string
     default: ""
-
+    
   terraform-plan-outfile:
-    description: Filename for plan results
+    description: |
+      Filename for results from terraform plan.
     type: string
     default: tfplan.json
 
@@ -138,51 +165,29 @@ parameters:
     type: string
     default: ""
 
-  trivy-version:
-    description: |
-      
-    type: string
-    default: ""
-
-  tfc-workspace:
-    description: Used for workspace 'creation' workflow
-    type: string
-    default: ""
-
-  tfc-organization:
-    description: name of terraform cloud organization
-    type: string
-    default: ""
-
-  tfe-token:
-    description: terraform team-api token. Uses $TFE_TOKEN by default
-    type: string
-    default: $TFE_TOKEN
-
-  before-terraform:
-    description: Optional steps to run before running terraform
-    type: steps
-    default: []
-
   after-terraform-init:
     description: Optional steps to run after terraform init but before running terraform plan
     type: steps
     default: []
 
-  after-terraform:
-    description: Optional steps to run after running terraform plan
+  before-plan:
+    description: Optional steps to run before terraform plan
     type: steps
     default: []
 
+  after-plan:
+    description: Optional steps to run after terraform plan
+    type: steps
+    default: []
 
 steps:
   - checkout
   - setup_remote_docker
   - when:
-      name: Run before-terraform lifecycle hook steps
-      condition: << parameters.before-terraform >>
+      name: Run before-plan lifecycle hook steps
+      condition: << parameters.before-plan >>
       working_directory: << parameters.working-directory >>
-      steps: << parameters.before-terraform >>
+      steps: << parameters.before-plan >>
   - packages:
       terraform-version: << parameters.terraform-version >>
       checkov-version: << parameters.checkov-version >>
@@ -206,7 +211,6 @@ steps:
       condition: << parameters.after-terraform-init >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.after-terraform-init >>
-
   - run:
       name: terraform plan
       working_directory: << parameters.working-directory >>
@@ -216,35 +220,26 @@ steps:
           <<#parameters.terraform-plan-additional-args>> << parameters.terraform-plan-additional-args >> <</parameters.terraform-plan-additional-args>> \
           --out tfplan.binary
           terraform show -json tfplan.binary | jq '.' > << parameters.terraform-plan-outfile >>
-
   - when:
-      name: run checkov scan of terraform source and plan outfile
+      name: run checkov scan of terraform source files
       condition: << parameters.checkov-version >>
       steps:
         - checkov:
             working-directory: << parameters.working-directory >>
-            terraform-plan-outfile: << parameters.terraform-plan-outfile >>
             checkov-additional-args: << parameters.checkov-additional-args >>
+            terraform-plan-outfile:  << parameters.terraform-plan-outfile >>
   - when:
-      name: run Snyk IaC scan of terraform source and plan outfile
+      name: run Snyk IaC scan of terraform source files
       condition: << parameters.snyk-version >>
       steps:
         - snyk:
             working-directory: << parameters.working-directory >>
-            terraform-plan-outfile: << parameters.terraform-plan-outfile >>
             snyk-token: << parameters.snyk-token >>
             snyk-organization: << parameters.snyk-organization >>
             snyk-additional-args: << parameters.snyk-additional-args >>
+            terraform-plan-outfile:  << parameters.terraform-plan-outfile >>
   - when:
-      name: run Trivy iaC scan of terraform plan outfile
-      condition: << parameters.trivy-version >>
-      working-directory: << parameters.working-directory >>
-      steps:
-        - run:
-            name: run trivy scan of terraform plan outfile
-            command: trivy config ./<< parameters.terraform-plan-outfile >>
-  - when:
-      name: Run after-terraform lifecycle hook steps
-      condition: << parameters.after-terraform >>
+      name: Run after-plan lifecycle hook steps
+      condition: << parameters.after-plan >>
       working_directory: << parameters.working-directory >>
-      steps: << parameters.after-terraform >>
+      steps: << parameters.after-plan >>
