@@ -1,29 +1,25 @@
 # src/examples/standard-example.yaml
 # yamllint disable rule:line-length
 ---
-description: Standard usage of the twdps/terraform orb plan and apply jobs.
+description: Standard usage of the twdps/terraform orb workflow jobs
 
 usage:
   version: 2.1
 
   orbs:
-    terraform: twdps/terraform@0.1.0
+    terraform: twdps/terraform@1.0.0
 
   globals:
     - &context my-team
-    - &shell-options secrethub run -- /bin/sh -eo pipefail
-    - &terraform-version 1.0.6
+    - &shell-options op run --env-file op.env -- /bin/bash -eo pipefail
+    - &terraform-version 1.6.2
 
-  # ==== triggers
-
-  # git push: deploy sandbox
   on-push-main: &on-push-main
     branches:
       only: /main/
     tags:
       ignore: /.*/
 
-  # git tag: release
   on-tag-main: &on-tag-main
     branches:
       ignore: /.*/
