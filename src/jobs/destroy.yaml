@@ -1,0 +1,313 @@
+# /src/jobs/destroy.yaml
+# yamllint disable rule:line-length
+---
+
+description: >
+  Terraform destroy workflow.
+
+  Includes the following optional customizations:
+
+  - Set desired terraform version. Default is the version installed on the executor.
+  - Use your own docker image executor. Default is twdps/circleci-infra-aws:alpine-stable.
+  - Set an executor resource-class, default is medium.
+  - Set the executor shell process launch configuration, default is '/bin/bash -eo pipefail'
+  - Specify a working-directory, default is .
+  - Select a terraform workspace, default is none.
+
+  Note: Does not include full static code analysis hooks or terrafrom plan. Use the included
+  static-analysis and plan jobs.
+
+  Note: The default executor image in this job is effectively set to Latest.
+  While this is efficient for orb development purposes, it is recommended
+  to always pin the executor version when using orbs in actual infrastructure
+  pipelines.
+
+  Note: Executor resources sizes 2xlarge and 2xlarge+ require review by
+  circleci support. Open a support ticket to request access.
+
+executor:
+  name: circleci-infra-aws
+  executor-image: << parameters.executor-image >>
+  resource-class: << parameters.resource-class >>
+  username: << parameters.executor-registry-username >>
+  password: << parameters.executor-registry-password >>
+
+environment:
+  TF_WORKSPACE: << parameters.workspace >>
+shell: << parameters.shell >>
+
+parameters:
+
+  working-directory:
+    description: Specific folder in which to run the commands.
+    type: string
+    default: '.'
+
+  workspace:
+    description: Terraform workspace infrastructure environment.
+    type: string
+    default: ""
+
+  tfc-workspace:
+    description: Create and/or set local-mode workspace.
+    type: string
+    default: ""
+
+  tfe-token:
+    description: Terraform team-api token. Uses $TFE_TOKEN by default.
+    type: env_var_name
+    default: TFE_TOKEN
+
+  tfc-organization:
+    description: Terraform cloud organization name.
+    type: string
+    default: ""
+
+  executor-image:
+    description: |
+      Available override. Default is docker.io/twdps/circleci-infra-aws:alpine-stable.
+    type: string
+    default: docker.io/twdps/circleci-infra-aws:alpine-stable
+
+  executor-registry-username:
+    description: |
+      Environment variable to reference as username for the registry
+      specified by executor-image parameter.
+    type: env_var_name
+    default: DOCKER_LOGIN
+
+  executor-registry-password:
+    description: |
+      Environment variable to reference as password for the registry
+      specified by executor-image parameter.
+    type: env_var_name
+    default: DOCKER_PASSWORD
+
+  resource-class:
+    description: Executor resource size. Default is medium.
+    type: enum
+    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    default: medium
+
+  shell:
+    description: |
+      default shell invocation. Override to support different shells or
+      tools like 1password.
+    type: string
+    default: /bin/bash -eo pipefail
+
+  terraform-version:
+    description: |
+      If you specify a terraform version, it will be installed and used by
+      all orb terraform functions. Leave blank or specify version "installed"
+      to use the version already installed on the executor.
+    type: string
+    default: ""
+
+  terraform-init-additional-args:
+    description: |
+      Include any additional terraform init command arguments.
+      Default is -backend=false.
+    type: string
+    default: -backend=false
+
+  terraform-apply-additional-args:
+    description:  |
+      Include any additional terraform apply command arguments. Can be used in conjunction with
+      terraform-var-file parameter or an override.
+    type: string
+    default: ""
+
+  terraform-var-file:
+    description: Include terraform -var-file parameter.
+    type: string
+    default: ""
+    
+  after-terraform-init:
+    description: |
+      Optional steps to run after terraform init but before running terraform plan.
+    type: steps
+    default: []
+
+  before-apply:
+    description: Optional steps to run before terraform apply.
+    type: steps
+    default: []
+
+  after-apply:
+    description: Optional steps to run after terraform apply.
+    type: steps
+    default: []
+
+steps:
+  - checkout
+  - setup_remote_docker
+  - when:
+      name: Run before-apply lifecycle hook steps
+      condition: << parameters.before-apply >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.before-apply >>
+  - packages:
+      terraform-version: << parameters.terraform-version >>
+  - run:
+      name: terraform init
+      working_directory: << parameters.working-directory >>
+      command: |
+        terraform version
+        terraform init << parameters.terraform-init-additional-args >>
+  - when:
+      name: Run after-terraform-init lifecycle hook steps
+      condition: << parameters.after-terraform-init >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.after-terraform-init >>
+  - run:
+      name: terraform apply
+      working_directory: << parameters.working-directory >>
+      command: |
+        terraform apply \
+          <<#parameters.terraform-var-file>> -var-file=<< parameters.terraform-var-file >> <</parameters.terraform-var-file>> \
+          <<#parameters.terraform-apply-additional-args>> << parameters.terraform-apply-additional-args >> <</parameters.terraform-apply-additional-args>> \
+          --auto-approve
+  - when:
+      name: Run after-apply lifecycle hook steps
+      condition: << parameters.after-apply >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.after-apply >>
+
+
+
+
+
+
+
+
+
+==========
+description: >
+  Terraform destroy workflow.
+
+  Includes the following optional customizations:
+
+  - set desired terraform version. Default is the version installed on the executor.
+  - reference your own docker image executor. Default is twdps/circleci-infra-aws
+  - set an executor resource-class, default is medium
+  - set the executor shell process launch configuration, default is '/bin/sh -eo pipefail'
+  - specify a working-directory, default is .
+  - select a terraform workspace, default is none
+
+  Keep in mind that latest or executor default versions will change. Pin terraform version
+  to prevent if desired.
+
+executor:
+  name: circleci-infra-aws
+  executor-image: << parameters.executor-image >>
+  resource-class: << parameters.resource-class >>
+  username: << parameters.executor-registry-username >>
+  password: << parameters.executor-registry-password >>
+
+environment:
+  TF_WORKSPACE: << parameters.workspace >>
+shell: << parameters.shell >>
+
+parameters:
+
+  working-directory:
+    description: specific folder in which to run the commands
+    type: string
+    default: '.'
+
+  workspace:
+    description: set terraform workspace infrastructure environment
+    type: string
+    default: ""
+
+  executor-image:
+    description: available override
+    type: string
+    default: docker.io/twdps/circleci-infra-aws:alpine-stable
+
+  executor-registry-username:
+    description: Environment variable to reference as username for the registry specified by executor-image parameter
+    type: env_var_name
+    default: DOCKER_LOGIN
+
+  executor-registry-password:
+    description: Environment variable to reference as password for the registry specified by executor-image parameter
+    type: env_var_name
+    default: DOCKER_PASSWORD
+
+  resource-class:
+    type: enum
+    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    default: medium
+
+  shell:
+    description: default shell invocation. Override to support different shells or tools like secrethub.io
+    type: string
+    default: /bin/sh -eo pipefail
+
+  terraform-version:
+    description: must provide the release version of terraform
+    type: string
+    default: ""
+
+  var-file:
+    description: terraform variable file to include in plan
+    type: string
+    default: ""
+
+  extra-terraform-args:
+    description: additional command line arguements for terraform plan
+    type: string
+    default: ""
+
+  backend-conf:
+    description: additional terraform init parameters to configure backend.conf if necessary
+    type: string
+    default: ""
+
+  before-terraform:
+    description: Optional steps to run before running terraform
+    type: steps
+    default: []
+
+  after-terraform-init:
+    description: Optional steps to run after terraform init but before running terraform plan
+    type: steps
+    default: []
+
+  after-terraform:
+    description: Optional steps to run after running terraform plan
+    type: steps
+    default: []
+
+steps:
+  - checkout
+  - setup_remote_docker
+  - when:
+      name: Run before-terraform lifecycle hook steps
+      condition: << parameters.before-terraform >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.before-terraform >>
+  - packages:
+      terraform-version: << parameters.terraform-version >>
+  - run:
+      name: terraform init
+      working_directory: << parameters.working-directory >>
+      command: |
+        terraform version
+        terraform init <<#parameters.backend-conf>> << parameters.backend-conf >> <</parameters.backend-conf>>
+  - when:
+      name: Run after-terraform-init lifecycle hook steps
+      condition: << parameters.after-terraform-init >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.after-terraform-init >>
+  - run:
+      name: terraform destroy
+      working_directory: << parameters.working-directory >>
+      command: terraform destroy <<#parameters.var-file>> -var-file=<< parameters.var-file >> <</parameters.var-file>> <<#parameters.extra-terraform-args>> << parameters.extra-terraform-args >> <</parameters.extra-terraform-args>> --auto-approve
+  - when:
+      name: Run after-terraform lifecycle hook steps
+      condition: << parameters.after-terraform >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.after-terraform >>
