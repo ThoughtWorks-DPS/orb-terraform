@@ -111,9 +111,9 @@ parameters:
     type: string
     default: -backend=false
 
-  terraform-plan-additional-args:
+  terraform-apply-additional-args:
     description:  |
-      Include any additional terraform plan command arguments. Can be used in conjunction with
+      Include any additional terraform apply command arguments. Can be used in conjunction with
       terraform-var-file parameter or an override.
     type: string
     default: ""
@@ -123,61 +123,19 @@ parameters:
     type: string
     default: ""
     
-  terraform-plan-outfile:
-    description: Filename for output results from terraform plan.
-    type: string
-    default: tfplan.json
-
-  snyk-version:
-    description: |
-      Providing a tflint version results in a snyk scan of the repo using
-      the desired version. Specify version "installed" to use the version
-      already installed on the executor.
-    type: string
-    default: ""
-
-  snyk-token:
-    description: |
-      Name of env var containing your Snyk API token. Default is SNYK_TOKEN.
-    type: env_var_name
-    default: SNYK_TOKEN
-
-  snyk-organization:
-    description: Snyk organization to reference.
-    type: string
-    default: ""
-
-  snyk-additional-args:
-    description: Optional additional flags to be passed to Snyk IaC.
-    type: string
-    default: ""
-
-  checkov-version:
-    description: |
-      Providing a tflint version results in a checkov scan of the repo using
-      the desired version. Specify version "installed" to use the version
-      already installed on the executor.
-    type: string
-    default: ""
-
-  checkov-additional-args:
-    description: Optional additional flags to be passed to checkov.
-    type: string
-    default: ""
-
   after-terraform-init:
     description: |
       Optional steps to run after terraform init but before running terraform plan.
     type: steps
     default: []
 
-  before-plan:
-    description: Optional steps to run before terraform plan.
+  before-apply:
+    description: Optional steps to run before terraform apply.
     type: steps
     default: []
 
-  after-plan:
-    description: Optional steps to run after terraform plan.
+  after-apply:
+    description: Optional steps to run after terraform apply.
     type: steps
     default: []
 
@@ -185,22 +143,12 @@ steps:
   - checkout
   - setup_remote_docker
   - when:
-      name: Run before-plan lifecycle hook steps
-      condition: << parameters.before-plan >>
+      name: Run before-apply lifecycle hook steps
+      condition: << parameters.before-apply >>
       working_directory: << parameters.working-directory >>
-      steps: << parameters.before-plan >>
+      steps: << parameters.before-apply >>
   - packages:
       terraform-version: << parameters.terraform-version >>
-      checkov-version: << parameters.checkov-version >>
-      snyk-version: << parameters.snyk-version >>
-  - when:
-      name: Confirm or Create tfcloud workspace in local-execute-mode
-      condition: << parameters.tfc-workspace >>
-      steps:
-        - use-tfc-local-mode:
-            tfc-workspace: << parameters.tfc-workspace >>
-            tfc-organization: << parameters.tfc-organization >>
-            tfe-token: << parameters.tfe-token >>
   - run:
       name: terraform init
       working_directory: << parameters.working-directory >>
@@ -213,14 +161,12 @@ steps:
       working_directory: << parameters.working-directory >>
       steps: << parameters.after-terraform-init >>
   - run:
-      name: terraform plan
+      name: terraform apply
       working_directory: << parameters.working-directory >>
       command: |
-        terraform plan \
+        terraform apply \
           <<#parameters.terraform-var-file>> -var-file=<< parameters.terraform-var-file >> <</parameters.terraform-var-file>> \
-          <<#parameters.terraform-plan-additional-args>> << parameters.terraform-plan-additional-args >> <</parameters.terraform-plan-additional-args>> \
-          --out tfplan.binary
-          terraform show -json tfplan.binary | jq '.' > << parameters.terraform-plan-outfile >>
+          <<#parameters.terraform-apply-additional-args>> << parameters.terraform-apply-additional-args >> <</parameters.terraform-apply-additional-args>>
   - when:
       name: run checkov scan of terraform source files
       condition: << parameters.checkov-version >>
@@ -240,7 +186,7 @@ steps:
             snyk-additional-args: << parameters.snyk-additional-args >>
             terraform-plan-outfile:  << parameters.terraform-plan-outfile >>
   - when:
-      name: Run after-plan lifecycle hook steps
-      condition: << parameters.after-plan >>
+      name: Run after-apply lifecycle hook steps
+      condition: << parameters.after-apply >>
       working_directory: << parameters.working-directory >>
-      steps: << parameters.after-plan >>
+      steps: << parameters.after-apply >>

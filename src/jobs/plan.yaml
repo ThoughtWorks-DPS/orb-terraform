@@ -108,9 +108,8 @@ parameters:
   terraform-init-additional-args:
     description: |
       Include any additional terraform init command arguments.
-      Default is -backend=false.
     type: string
-    default: -backend=false
+    default: ""
 
   terraform-plan-additional-args:
     description:  |
