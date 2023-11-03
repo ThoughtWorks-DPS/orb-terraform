@@ -130,7 +130,7 @@ workflows:
           tfc-organization: twdps
           tfe-token: TFE_TOKEN
           terraform-var-file: ci.tfvars.json
-          terraform-plan-outfile: test/tfplan.json
+          terraform-plan-outfile: ~/project/test/tfplan.json
           snyk-version: installed
           snyk-organization: twdps
           checkov-version: installed
