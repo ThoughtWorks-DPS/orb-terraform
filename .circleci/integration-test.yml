@@ -61,7 +61,7 @@ commands:
             TFC_ORGANIZATION: << parameters.tfc-organization >>
             TFC_WORKSPACE: << parameters.tfc-workspace >>
             TFE_TOKEN: $TFE_TOKEN
-          command: bash delete_tfc_workspace.sh
+          command: bash test/delete_tfc_workspace.sh
           
 jobs:
 

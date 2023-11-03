@@ -91,17 +91,62 @@ usage:
             filters: *on-push-main
 
         - terraform/apply:
-            name: sandbox-change-apply
+            name: apply changes to sandbox environment
             context: *context
-            shell: *shell-options
+            shell: *shell
             workspace: sandbox
-            terraform-version: *terraform-version
-            before-terraform:
-              - set-environment:
-                  env: sandbox
+            tfc-workspace: my-pipeline-sandbox
+            tfc-organization: twdps
+            tfe-token: TFE_TOKEN
+            terraform-var-file: environments/sandbox.tfvars.json
+            snyk-version: installed
+            snyk-organization: twdps
+            snyk-additional-args: --report --target-name= my-pipeline-sandbox
+            before-plan:
+              - set-environment
             requires:
               - approve-sandbox-changes
             filters: *on-push-main
 
 
+        - terraform/plan:
+            name: plan changes for preview environment
+            context: *context
+            shell: *shell
+            workspace: preview
+            tfc-workspace: my-pipeline-preview
+            tfc-organization: twdps
+            tfe-token: TFE_TOKEN
+            terraform-var-file: environments/preview.tfvars.json
+            snyk-version: installed
+            snyk-organization: twdps
+            snyk-additional-args: --report --target-name= my-pipeline-preview
+            before-plan:
+              - set-environment
+            requires:
+              - terraform static code analysis
+            filters: *on-tag-main
+
+        - approve-preview-changes:
+            type: approval
+            requires:
+              - plan changes for preview environment
+            filters: *on-tag-main
+
+        - terraform/apply:
+            name: apply changes to preview environment
+            context: *context
+            shell: *shell
+            workspace: preview
+            tfc-workspace: my-pipeline-preview
+            tfc-organization: twdps
+            tfe-token: TFE_TOKEN
+            terraform-var-file: environments/preview.tfvars.json
+            snyk-version: installed
+            snyk-organization: twdps
+            snyk-additional-args: --report --target-name= my-pipeline-preview
+            before-plan:
+              - set-environment
+            requires:
+              - approve-preview-changes
             filters: *on-tag-main
