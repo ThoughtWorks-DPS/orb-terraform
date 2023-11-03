@@ -30,11 +30,29 @@ commands:
           name: echo after-msg param
           command: echo "after - << parameters.msg >>"
 
-  add-for-plan-test:
+  create-terraform-workspace:
     steps:
       - run:
-          name: reconfigure versions.tf fixture for plan test
-          command: |
+          name: create terraform workspace
+          command: terraform workspace new ci
+
+  delete-terraform-workspace:
+    parameters:
+      tfc-organization:
+        description: terraform cloud organization Name
+        type: string
+        default: ""
+      tfc-workspace:
+        description: Create and/or set local-mode workspace
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: delete terraform workspace
+          environment:
+            TFC_ORGANIZATION: << parameters.tfc-organization >>
+            TFC_WORKSPACE: << parameters.tfc-wowrkspace >>
+          command: bash delete_tfc_workspace.sh
           
 jobs:
 
@@ -61,59 +79,55 @@ workflows:
     jobs:
       #- test packages command
 
-      - terraform/static-analysis:
-          context: *context
-          shell: *shell
-          working-directory: test
-          tflint-version: installed
-          tflint-provider: aws
-          tflint-additional-args: --format=compact --force
-          tfsec-version: installed
-          tfsec-additional-args: --exclude aws-ec2-no-excessive-port-access,aws-ec2-no-public-ingress-acl,aws-ec2-require-vpc-flow-logs-for-all-vpcs
-          trivy-version: installed
-          trivy-commandline-args: config . --exit-code 0
-          snyk-version: installed
-          snyk-organization: twdps
-          snyk-additional-args: --report --target-name=orb-terraform-ci
-          checkov-version: installed
-          checkov-additional-args: -d . --skip-check CKV_TF_1 
-          terrascan-version: installed
-          terrascan-custom-scan-args: -t aws -i terraform --output=yaml -d test/ --skip-rules="AC_AWS_0369"
-          driftctl-version: installed
-          driftctl-additional-args: --help
-          infracost-version: installed
-          infracost-additional-args: breakdown --path .
-          before-static-analysis:
-            - terraform/packages:
-                terrascan-version: 1.18.3
-                infracost-version: 0.10.29
-                trivy-version: 0.46.0
-            - before-job-message:
-                msg: Hello, before!
-          after-static-analysis:
-            - after-job-message:
-                msg: Hello, after!
-
-      # - terraform/plan:
+      # - terraform/static-analysis:
       #     context: *context
       #     shell: *shell
       #     working-directory: test
-      #     workspace: orb-terraform
-      #     terraform-var-file: varfile-check.tfvars
-      #     terraform-plan-outfile: filename-check.json
+      #     tflint-version: installed
+      #     tflint-provider: aws
+      #     tflint-additional-args: --format=compact --force
+      #     tfsec-version: installed
+      #     tfsec-additional-args: --exclude aws-ec2-no-excessive-port-access,aws-ec2-no-public-ingress-acl,aws-ec2-require-vpc-flow-logs-for-all-vpcs
+      #     trivy-version: installed
+      #     trivy-commandline-args: config . --exit-code 0
       #     snyk-version: installed
       #     snyk-organization: twdps
+      #     snyk-additional-args: --report --target-name=orb-terraform-ci
       #     checkov-version: installed
-      #     trivy-version: installed
-      #     tfc-workspace: orb-terraform-test
-      #     tfc-organization: twdps
-      #     before-terraform:
-      #       - add-for-plan-test
+      #     checkov-additional-args: -d . --skip-check CKV_TF_1 
+      #     terrascan-version: installed
+      #     terrascan-custom-scan-args: -t aws -i terraform --output=yaml -d test/ --skip-rules="AC_AWS_0369"
+      #     driftctl-version: installed
+      #     driftctl-additional-args: --help
+      #     infracost-version: installed
+      #     infracost-additional-args: breakdown --path .
+      #     before-static-analysis:
+      #       - terraform/packages:
+      #           terrascan-version: 1.18.3
+      #           infracost-version: 0.10.29
+      #           trivy-version: 0.46.0
       #       - before-job-message:
       #           msg: Hello, before!
-      #     after-terraform-init:
-      #       - after-job-message:
-      #           msg: Hello, after init!
-      #     after-terraform:
+      #     after-static-analysis:
       #       - after-job-message:
       #           msg: Hello, after!
+
+      - terraform/plan:
+          context: *context
+          shell: *shell
+          working-directory: test
+          workspace: ci
+          tfc-workspace: orb-terraform-ci
+          tfc-organization: twdps
+          snyk-version: installed
+          snyk-organization: twdps
+          checkov-version: installed
+          after-terraform-init:
+            - create-terraform-workspace
+          before-plan:
+            - before-job-message:
+                msg: Hello, before!
+          after-plan:
+            - delete-terraform-workspace
+            - after-job-message:
+                msg: Hello, after!

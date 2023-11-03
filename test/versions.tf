@@ -6,6 +6,13 @@ terraform {
       version = "~> 5.7"
     }
   }
+  backend "remote" {
+    hostname     = "app.terraform.io"
+    organization = "twdps"
+    workspaces {
+      prefix = "orb-terraform-"
+    }
+  }
 }
 
 provider "aws" {
@@ -15,7 +22,7 @@ provider "aws" {
     tags = {
       env                                          = var.instance_name
       cluster                                      = var.instance_name
-      pipeline                                     = "psk-aws-platform-vpc"
+      pipeline                                     = "orb-terraform"
     }
   }
 }
