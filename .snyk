@@ -12,3 +12,7 @@ ignore:
     - '*':
         reason: Default VPC resource detected
         expires: '2030-01-01T14:26:34.404Z'
+  SNYK-CC-TF-40:
+    - '*':
+        reason: Default VPC resource detected
+        expires: '2030-01-01T14:26:34.404Z'
