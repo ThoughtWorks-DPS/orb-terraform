@@ -120,6 +120,7 @@ workflows:
           workspace: ci
           tfc-workspace: orb-terraform-ci
           tfc-organization: twdps
+          tfe-token: $TFE_TOKEN
           snyk-version: installed
           snyk-organization: twdps
           checkov-version: installed
