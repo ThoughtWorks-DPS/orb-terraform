@@ -62,7 +62,7 @@ parameters:
     default: DOCKER_PASSWORD
 
   resource-class:
-    description: Executor resources size. Default is medium.
+    description: Executor resource size. Default is medium.
     type: enum
     enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
     default: medium
@@ -76,11 +76,9 @@ parameters:
 
   terraform-validate:
     description: |
-      Validate runs checks that verify whether a configuration is syntactically
+      Perform terraform validate and fmt check for configuration that is syntactically
       valid, internally consistent, and canonically formatted regardless of any
-      provided variables or existing state. It is thus primarily useful for
-      general verification of reusable modules, including correctness of
-      attribute names and value types.
+      provided variables or existing state. Default is true.
     type: boolean
     default: true
 

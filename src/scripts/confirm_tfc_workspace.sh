@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+echo "debug:"
+echo "TFC_ORGANIZATION $TFC_ORGANIZATION"
+echo "TFC_WORKSPACE $TFC_WORKSPACE"
+echo "TFE_TOKEN ${TFE_TOKEN:0:5}"
+
 # setup curl parameters
 tfc_api_url="https://app.terraform.io/api/v2/organizations"
 tfc_api_url_workspaces="$tfc_api_url/$TFC_ORGANIZATION/workspaces"
