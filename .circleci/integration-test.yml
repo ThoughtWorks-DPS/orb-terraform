@@ -51,7 +51,7 @@ commands:
           name: delete terraform workspace
           environment:
             TFC_ORGANIZATION: << parameters.tfc-organization >>
-            TFC_WORKSPACE: << parameters.tfc-wowrkspace >>
+            TFC_WORKSPACE: << parameters.tfc-workspace >>
           command: bash delete_tfc_workspace.sh
           
 jobs:
