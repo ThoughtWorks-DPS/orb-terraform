@@ -1,11 +1,7 @@
-# src/examples/static-analysis.yaml
+# src/examples/standard-example.yaml
 # yamllint disable rule:line-length
 ---
-
-description: >
-  Separate static analysis job prior to terraform plan using twdps/terraform orb.
-  Use this to run a single job that will run static analysis and security scanning prior to deployment.
-  Use the `static-analysis: false` flag to turn off individual static analysis during the plan jobs.
+description: Standard usage of the twdps/terraform orb workflow jobs
 
 usage:
   version: 2.1
@@ -13,23 +9,17 @@ usage:
   orbs:
     terraform: twdps/terraform@1.0.0
 
-  # ==== global pipeline parameters
   globals:
     - &context my-team
-    - &shell-options secrethub run -- /bin/sh -eo pipefail
-    - &terraform-version 1.0.6
-    - &snyk-org my-snyk-org
+    - &shell op run --env-file op.env -- /bin/bash -eo pipefail
+    - &terraform-version 1.6.2
 
-  # ==== triggers
-
-  # git push: deploy sandbox
   on-push-main: &on-push-main
     branches:
       only: /main/
     tags:
       ignore: /.*/
 
-  # git tag: release
   on-tag-main: &on-tag-main
     branches:
       ignore: /.*/
@@ -57,25 +47,46 @@ usage:
     my-pipeline:
 
       jobs:
-        # git push: deploy sandbox
-        - terraform/static-analysis:
-            name: static analysis
-            context: *context
-            shell: *shell-options
-            snyk-organization: *snyk-org
-            snyk-additional-args: --severity-threshold=high
-            before-static-analysis:
-              - run:
-                  name: setup snyk token
-                  command: echo "example of setting up secrets prior to static analysis"
-            filters: *on-push-main
+
+      - terraform/static-analysis:
+          context: *context
+          shell: *shell
+          terraforom-version: *terraform-version
+          tflint-version: installed
+          tflint-provider: aws
+          tflint-additional-args: --format=compact --force
+          tfsec-version: installed
+          tfsec-additional-args: --exclude aws-ec2-no-excessive-port-access,aws-ec2-no-public-ingress-acl,aws-ec2-require-vpc-flow-logs-for-all-vpcs
+          trivy-version: installed
+          trivy-commandline-args: config . --exit-code 0
+          snyk-version: installed
+          snyk-organization: twdps
+          snyk-additional-args: --report --target-name=orb-terraform-ci
+          checkov-version: installed
+          checkov-additional-args: -d . --skip-check CKV_TF_1 
+          terrascan-version: installed
+          terrascan-custom-scan-args: -t aws -i terraform --output=yaml -d test/ --skip-rules="AC_AWS_0369"
+          driftctl-version: installed
+          driftctl-additional-args: --help
+          infracost-version: installed
+          infracost-additional-args: breakdown --path .
+          before-static-analysis:
+            - terraform/packages:
+                terrascan-version: 1.18.3
+                infracost-version: 0.10.29
+                trivy-version: 0.46.0
+            - before-job-message:
+                msg: Hello, before!
+          after-static-analysis:
+            - after-job-message:
+                msg: Hello, after!
+
 
         - terraform/plan:
             name: sandbox-change-plan
             context: *context
             shell: *shell-options
             workspace: sandbox
-            static-analysis: false
             terraform-version: *terraform-version
             before-terraform:
               - set-environment:
@@ -107,7 +118,6 @@ usage:
             context: *context
             shell: *shell-options
             workspace: preview
-            static-analysis: false
             terraform-version: *terraform-version
             before-terraform:
               - set-environment:
