@@ -57,10 +57,6 @@ commands:
     steps:
       - run:
           name: delete terraform workspace
-          environment:
-            TFC_ORGANIZATION: << parameters.tfc-organization >>
-            TFC_WORKSPACE: << parameters.tfc-workspace >>
-            TFE_TOKEN: $TFE_TOKEN
           command: bash test/delete_tfc_workspace.sh
           
 jobs:
