@@ -1,0 +1,246 @@
+# /src/jobs/apply.yaml
+# yamllint disable rule:line-length
+---
+
+description: >
+  Terraform apply workflow.
+
+  Includes the following optional customizations:
+
+  - Set desired terraform version. Default is the version installed on the executor.
+  - Use your own docker image executor. Default is twdps/circleci-infra-aws:alpine-stable.
+  - Set an executor resource-class, default is medium.
+  - Set the executor shell process launch configuration, default is '/bin/bash -eo pipefail'
+  - Specify a working-directory, default is .
+  - Select a terraform workspace, default is none.
+
+  Note: Does not include full static code analysis hooks or terrafrom plan. Use the included
+  static-analysis and plan jobs.
+
+  Note: The default executor image in this job is effectively set to Latest.
+  While this is efficient for orb development purposes, it is recommended
+  to always pin the executor version when using orbs in actual infrastructure
+  pipelines.
+
+  Note: Executor resources sizes 2xlarge and 2xlarge+ require review by
+  circleci support. Open a support ticket to request access.
+
+executor:
+  name: circleci-infra-aws
+  executor-image: << parameters.executor-image >>
+  resource-class: << parameters.resource-class >>
+  username: << parameters.executor-registry-username >>
+  password: << parameters.executor-registry-password >>
+
+environment:
+  TF_WORKSPACE: << parameters.workspace >>
+shell: << parameters.shell >>
+
+parameters:
+
+  working-directory:
+    description: Specific folder in which to run the commands.
+    type: string
+    default: '.'
+
+  workspace:
+    description: Terraform workspace infrastructure environment.
+    type: string
+    default: ""
+
+  tfc-workspace:
+    description: Create and/or set local-mode workspace.
+    type: string
+    default: ""
+
+  tfe-token:
+    description: Terraform team-api token. Uses $TFE_TOKEN by default.
+    type: env_var_name
+    default: TFE_TOKEN
+
+  tfc-organization:
+    description: Terraform cloud organization name.
+    type: string
+    default: ""
+
+  executor-image:
+    description: |
+      Available override. Default is docker.io/twdps/circleci-infra-aws:alpine-stable.
+    type: string
+    default: docker.io/twdps/circleci-infra-aws:alpine-stable
+
+  executor-registry-username:
+    description: |
+      Environment variable to reference as username for the registry
+      specified by executor-image parameter.
+    type: env_var_name
+    default: DOCKER_LOGIN
+
+  executor-registry-password:
+    description: |
+      Environment variable to reference as password for the registry
+      specified by executor-image parameter.
+    type: env_var_name
+    default: DOCKER_PASSWORD
+
+  resource-class:
+    description: Executor resource size. Default is medium.
+    type: enum
+    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    default: medium
+
+  shell:
+    description: |
+      default shell invocation. Override to support different shells or
+      tools like 1password.
+    type: string
+    default: /bin/bash -eo pipefail
+
+  terraform-version:
+    description: |
+      If you specify a terraform version, it will be installed and used by
+      all orb terraform functions. Leave blank or specify version "installed"
+      to use the version already installed on the executor.
+    type: string
+    default: ""
+
+  terraform-init-additional-args:
+    description: |
+      Include any additional terraform init command arguments.
+      Default is -backend=false.
+    type: string
+    default: -backend=false
+
+  terraform-plan-additional-args:
+    description:  |
+      Include any additional terraform plan command arguments. Can be used in conjunction with
+      terraform-var-file parameter or an override.
+    type: string
+    default: ""
+
+  terraform-var-file:
+    description: Include terraform -var-file parameter.
+    type: string
+    default: ""
+    
+  terraform-plan-outfile:
+    description: Filename for output results from terraform plan.
+    type: string
+    default: tfplan.json
+
+  snyk-version:
+    description: |
+      Providing a tflint version results in a snyk scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
+    type: string
+    default: ""
+
+  snyk-token:
+    description: |
+      Name of env var containing your Snyk API token. Default is SNYK_TOKEN.
+    type: env_var_name
+    default: SNYK_TOKEN
+
+  snyk-organization:
+    description: Snyk organization to reference.
+    type: string
+    default: ""
+
+  snyk-additional-args:
+    description: Optional additional flags to be passed to Snyk IaC.
+    type: string
+    default: ""
+
+  checkov-version:
+    description: |
+      Providing a tflint version results in a checkov scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
+    type: string
+    default: ""
+
+  checkov-additional-args:
+    description: Optional additional flags to be passed to checkov.
+    type: string
+    default: ""
+
+  after-terraform-init:
+    description: |
+      Optional steps to run after terraform init but before running terraform plan.
+    type: steps
+    default: []
+
+  before-plan:
+    description: Optional steps to run before terraform plan.
+    type: steps
+    default: []
+
+  after-plan:
+    description: Optional steps to run after terraform plan.
+    type: steps
+    default: []
+
+steps:
+  - checkout
+  - setup_remote_docker
+  - when:
+      name: Run before-plan lifecycle hook steps
+      condition: << parameters.before-plan >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.before-plan >>
+  - packages:
+      terraform-version: << parameters.terraform-version >>
+      checkov-version: << parameters.checkov-version >>
+      snyk-version: << parameters.snyk-version >>
+  - when:
+      name: Confirm or Create tfcloud workspace in local-execute-mode
+      condition: << parameters.tfc-workspace >>
+      steps:
+        - use-tfc-local-mode:
+            tfc-workspace: << parameters.tfc-workspace >>
+            tfc-organization: << parameters.tfc-organization >>
+            tfe-token: << parameters.tfe-token >>
+  - run:
+      name: terraform init
+      working_directory: << parameters.working-directory >>
+      command: |
+        terraform version
+        terraform init << parameters.terraform-init-additional-args >>
+  - when:
+      name: Run after-terraform-init lifecycle hook steps
+      condition: << parameters.after-terraform-init >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.after-terraform-init >>
+  - run:
+      name: terraform plan
+      working_directory: << parameters.working-directory >>
+      command: |
+        terraform plan \
+          <<#parameters.terraform-var-file>> -var-file=<< parameters.terraform-var-file >> <</parameters.terraform-var-file>> \
+          <<#parameters.terraform-plan-additional-args>> << parameters.terraform-plan-additional-args >> <</parameters.terraform-plan-additional-args>> \
+          --out tfplan.binary
+          terraform show -json tfplan.binary | jq '.' > << parameters.terraform-plan-outfile >>
+  - when:
+      name: run checkov scan of terraform source files
+      condition: << parameters.checkov-version >>
+      steps:
+        - checkov:
+            working-directory: << parameters.working-directory >>
+            checkov-additional-args: << parameters.checkov-additional-args >>
+            terraform-plan-outfile:  << parameters.terraform-plan-outfile >>
+  - when:
+      name: run Snyk IaC scan of terraform source files
+      condition: << parameters.snyk-version >>
+      steps:
+        - snyk:
+            working-directory: << parameters.working-directory >>
+            snyk-token: << parameters.snyk-token >>
+            snyk-organization: << parameters.snyk-organization >>
+            snyk-additional-args: << parameters.snyk-additional-args >>
+            terraform-plan-outfile:  << parameters.terraform-plan-outfile >>
+  - when:
+      name: Run after-plan lifecycle hook steps
+      condition: << parameters.after-plan >>
+      working_directory: << parameters.working-directory >>
+      steps: << parameters.after-plan >>
