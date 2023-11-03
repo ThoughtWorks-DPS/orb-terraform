@@ -7,7 +7,7 @@ description: >
   analysis and linting tasks.
 
   Supported tools:
-  - terraform validate (default)
+  - terraform validate and fmt (default)
   - tflint
   - tfsec
   - trivy
@@ -37,38 +37,40 @@ shell: << parameters.shell >>
 parameters:
 
   working-directory:
-    description: specific folder in which to run the commands
+    description: Specific folder in which to run the commands.
     type: string
     default: '.'
 
   executor-image:
-    description: available override
+    description: |
+      Available override. Default is docker.io/twdps/circleci-infra-aws:alpine-stable.
     type: string
     default: docker.io/twdps/circleci-infra-aws:alpine-stable
 
   executor-registry-username:
     description: |
       Environment variable to reference as username for the registry
-      specified by executor-image parameter
+      specified by executor-image parameter.
     type: env_var_name
     default: DOCKER_LOGIN
 
   executor-registry-password:
     description: |
       Environment variable to reference as password for the registry
-      specified by executor-image parameter
+      specified by executor-image parameter.
     type: env_var_name
     default: DOCKER_PASSWORD
 
   resource-class:
+    description: Executor resources size. Default is medium.
     type: enum
     enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
     default: medium
 
   shell:
     description: |
-      default shell invocation. Override to support different shells or
-      tools like secrethub.io
+      Default shell invocation. Override to support different shells or
+      tools like 1password.
     type: string
     default: /bin/bash -eo pipefail
 
