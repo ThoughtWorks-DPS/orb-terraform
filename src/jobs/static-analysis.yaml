@@ -129,7 +129,7 @@ parameters:
 
   tfsec-version:
     description: |
-      Providing a tflint version results in a tfsec scan of the repo using
+      Providing a tfsec version results in a tfsec scan of the repo using
       the desired version. Specify version "installed" to use the version
       already installed on the executor.
     type: string
@@ -158,7 +158,7 @@ parameters:
 
   snyk-version:
     description: |
-      Providing a tflint version results in a snyk scan of the repo using
+      Providing a snyk version results in a snyk scan of the repo using
       the desired version. Specify version "installed" to use the version
       already installed on the executor.
     type: string
@@ -182,20 +182,20 @@ parameters:
 
   checkov-version:
     description: |
-      Providing a tflint version results in a checkov scan of the repo using
+      Providing a checkov version results in a checkov scan of the repo using
       the desired version. Specify version "installed" to use the version
       already installed on the executor.
     type: string
     default: ""
 
   checkov-additional-args:
-    description: optional additional flags to be passed to checkov
+    description: Optional additional flags to be passed to checkov.
     type: string
     default: ""
 
   terrascan-version:
     description: |
-      Providing a tflint version results in a terrascan scan of the repo using
+      Providing a terrascan version results in a terrascan scan of the repo using
       the desired version. Specify version "installed" to use the version
       already installed on the executor.
     type: string
@@ -226,7 +226,7 @@ parameters:
 
   driftctl-version:
     description: |
-      Providing a tflint version results in a driftctl scan of the repo using
+      Providing a driftctl version results in a driftctl scan of the repo using
       the desired version. Specify version "installed" to use the version
       already installed on the executor.
     type: string
@@ -239,7 +239,7 @@ parameters:
 
   infracost-version:
     description: |
-      Providing a tflint version results in a infracost scan of the repo using
+      Providing a infracost version results in a infracost scan of the repo using
       the desired version. Specify version "installed" to use the version
       already installed on the executor.
     type: string

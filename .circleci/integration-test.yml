@@ -36,7 +36,7 @@ commands:
           env-file: op.env
       - run:
           name: set ~/.terraformrc
-          command: op inject -i terraformrc.tpl -o ~/.terraformrc
+          command: op inject -i test/terraformrc.tpl -o ~/.terraformrc
 
   create-terraform-workspace:
     steps:
