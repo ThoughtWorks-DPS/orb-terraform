@@ -134,7 +134,9 @@ workflows:
           checkov-version: installed
           before-plan:
             - set-environment
-          after-terraform-init:
             - create-terraform-workspace
+          after-terraform-init:
+            - after-job-message:
+                msg: Hello, after init!
           after-plan:
             - delete-terraform-workspace

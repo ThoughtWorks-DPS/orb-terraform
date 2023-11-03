@@ -7,16 +7,16 @@ description: >
 
   Includes the following optional customizations:
 
-  - set desired terraform version. Default is the version installed on the executor
-  - specify a working-directory, default is .
-  - select a terraform workspace, default is none
-  - reference your own docker image executor. Default is twdps/circleci-infra-aws
-  - set an executor resource-class, default is medium
-  - set the executor shell process launch configuration, default is '/bin/sh -eo pipefail'
-  - set a desired version and custom args for checkov and snyk scans of plan output
+  - Set desired terraform version. Default is the version installed on the executor.
+  - Specify a working-directory, default is .
+  - Select a terraform workspace, default is none.
+  - Use your own docker image executor. Default is twdps/circleci-infra-aws
+  - Set an executor resource-class, default is medium
+  - Set the executor shell process launch configuration, default is '/bin/bash -eo pipefail'
+  - Set a desired version and custom args for checkov and snyk scans of plan output
 
   Note: Does not include full static code analysis hooks. Use the included
-  static-analysis job during the ci phase.
+  static-analysis job during a ci phase.
 
   Note: The default executor image in this job is effectively set to Latest.
   While this is efficient for orb development purposes, it is recommended
@@ -45,45 +45,47 @@ parameters:
     default: '.'
 
   workspace:
-    description: sSt terraform workspace infrastructure environment.
+    description: Terraform workspace infrastructure environment.
     type: string
     default: ""
 
   tfc-workspace:
-    description: Create and/or set local-mode workspace
+    description: Create and/or set local-mode workspace.
     type: string
     default: ""
 
   tfe-token:
-    description: terraform team-api token. Uses $TFE_TOKEN by default
+    description: Terraform team-api token. Uses $TFE_TOKEN by default.
     type: env_var_name
     default: TFE_TOKEN
 
   tfc-organization:
-    description: terraform cloud organization Name
+    description: Terraform cloud organization name.
     type: string
     default: ""
 
   executor-image:
-    description: available override
+    description: |
+      Available override. Default is docker.io/twdps/circleci-infra-aws:alpine-stable.
     type: string
     default: docker.io/twdps/circleci-infra-aws:alpine-stable
 
   executor-registry-username:
     description: |
       Environment variable to reference as username for the registry
-      specified by executor-image parameter
+      specified by executor-image parameter.
     type: env_var_name
     default: DOCKER_LOGIN
 
   executor-registry-password:
     description: |
       Environment variable to reference as password for the registry
-      specified by executor-image parameter
+      specified by executor-image parameter.
     type: env_var_name
     default: DOCKER_PASSWORD
 
   resource-class:
+    description: Executor resource size. Default is medium.
     type: enum
     enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
     default: medium
@@ -91,13 +93,13 @@ parameters:
   shell:
     description: |
       default shell invocation. Override to support different shells or
-      tools like secrethub.io
+      tools like 1password.
     type: string
     default: /bin/bash -eo pipefail
 
   terraform-version:
     description: |
-      If you specify a specific version, it will be installed and used by
+      If you specify a terraform version, it will be installed and used by
       all orb terraform functions. Leave blank or specify version "installed"
       to use the version already installed on the executor.
     type: string
@@ -118,13 +120,12 @@ parameters:
     default: ""
 
   terraform-var-file:
-    description: Include terraform -var-file parameter
+    description: Include terraform -var-file parameter.
     type: string
     default: ""
     
   terraform-plan-outfile:
-    description: |
-      Filename for results from terraform plan.
+    description: Filename for output results from terraform plan.
     type: string
     default: tfplan.json
 
@@ -161,22 +162,23 @@ parameters:
     default: ""
 
   checkov-additional-args:
-    description: optional additional flags to be passed to checkov
+    description: Optional additional flags to be passed to checkov.
     type: string
     default: ""
 
   after-terraform-init:
-    description: Optional steps to run after terraform init but before running terraform plan
+    description: |
+      Optional steps to run after terraform init but before running terraform plan.
     type: steps
     default: []
 
   before-plan:
-    description: Optional steps to run before terraform plan
+    description: Optional steps to run before terraform plan.
     type: steps
     default: []
 
   after-plan:
-    description: Optional steps to run after terraform plan
+    description: Optional steps to run after terraform plan.
     type: steps
     default: []
 
