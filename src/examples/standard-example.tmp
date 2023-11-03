@@ -48,33 +48,36 @@ usage:
 
       jobs:
 
-      - terraform/static-analysis:
-          context: *context
-          shell: *shell
-          terraforom-version: *terraform-version
-          tflint-version: installed
-          tflint-provider: aws
-          tflint-additional-args: --format=compact --force
-          tfsec-version: installed
-          tfsec-additional-args: --exclude aws-ec2-no-excessive-port-access,aws-ec2-no-public-ingress-acl,aws-ec2-require-vpc-flow-logs-for-all-vpcs
-          snyk-version: installed
-          snyk-organization: twdps
-          snyk-additional-args: --report --target-name=orb-terraform-ci
-          before-static-analysis:
-            - set-environment
-          filter: *on-push-main
-
-
+        - terraform/static-analysis:
+            context: *context
+            shell: *shell
+            workspace: sandbox
+            terraforom-version: *terraform-version
+            tflint-version: installed
+            tflint-provider: aws
+            tflint-additional-args: --format=compact --force
+            tfsec-version: installed
+            tfsec-additional-args: --exclude aws-ec2-no-excessive-port-access,aws-ec2-no-public-ingress-acl,aws-ec2-require-vpc-flow-logs-for-all-vpcs
+            snyk-version: installed
+            snyk-organization: twdps
+            snyk-additional-args: --report --target-name=orb-terraform-ci
+            before-static-analysis:
+              - set-environment
+            filter: *on-push-main
 
         - terraform/plan:
-            name: sandbox-change-plan
             context: *context
-            shell: *shell-options
+            shell: *shell
             workspace: sandbox
-            terraform-version: *terraform-version
-            before-terraform:
-              - set-environment:
-                  env: sandbox
+            tfc-workspace: my-pipeline-sandbox
+            tfc-organization: twdps
+            tfe-token: TFE_TOKEN
+            terraform-var-file: environments/sandbox.tfvars.json
+            snyk-version: installed
+            snyk-organization: twdps
+            snyk-additional-args: --report --target-name= my-pipeline-sandbox
+            before-plan:
+              - set-environment
             filters: *on-push-main
 
         - approve-sandbox-changes:
