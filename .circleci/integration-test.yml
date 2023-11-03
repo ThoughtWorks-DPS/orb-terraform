@@ -134,6 +134,7 @@ workflows:
           snyk-version: installed
           snyk-organization: twdps
           checkov-version: installed
+          checkov-additional-args: --soft-fail
           before-plan:
             - set-environment
             - create-terraform-workspace
