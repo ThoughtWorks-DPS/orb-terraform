@@ -12,22 +12,23 @@ description: |
 
 parameters:
   executor-image:
-    description: Override the default image
+    description: Override the default image.
     type: string
     default: docker.io/twdps/circleci-infra-aws:stable
 
   resource-class:
+    description: Executor resource size. Default is medium.
     type: enum
     enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
     default: medium
 
   username:
-    description: username for executor registry authentication
+    description: Username for executor registry authentication.
     type: env_var_name
     default: DOCKER_LOGIN
 
   password:
-    description: password for executor registry authentication
+    description: Password for executor registry authentication.
     type: env_var_name
     default: DOCKER_PASSWORD
 
