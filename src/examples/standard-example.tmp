@@ -49,6 +49,7 @@ usage:
       jobs:
 
         - terraform/static-analysis:
+            name: terraform static code analysis
             context: *context
             shell: *shell
             workspace: sandbox
@@ -66,6 +67,7 @@ usage:
             filter: *on-push-main
 
         - terraform/plan:
+            name: plan changes for sandbox environment
             context: *context
             shell: *shell
             workspace: sandbox
@@ -78,12 +80,14 @@ usage:
             snyk-additional-args: --report --target-name= my-pipeline-sandbox
             before-plan:
               - set-environment
+            requires:
+              - terraform static code analysis
             filters: *on-push-main
 
         - approve-sandbox-changes:
             type: approval
             requires:
-              - sandbox-change-plan
+              - plan changes for sandbox environment
             filters: *on-push-main
 
         - terraform/apply:
@@ -99,33 +103,5 @@ usage:
               - approve-sandbox-changes
             filters: *on-push-main
 
-        # git tag: deploy preview
-        - terraform/plan:
-            name: preview-change-plan
-            context: *context
-            shell: *shell-options
-            workspace: preview
-            terraform-version: *terraform-version
-            before-terraform:
-              - set-environment:
-                  env: preview
-            filters: *on-tag-main
 
-        - approve-preview-changes:
-            type: approval
-            requires:
-              - preview-change-plan
-            filters: *on-tag-main
-
-        - terraform/apply:
-            name: preview-change-apply
-            context: *context
-            shell: *shell-options
-            workspace: preview
-            terraform-version: *terraform-version
-            before-terraform:
-              - set-environment:
-                  env: preview
-            requires:
-              - approve-preview-changes
             filters: *on-tag-main
