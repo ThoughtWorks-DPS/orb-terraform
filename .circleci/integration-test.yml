@@ -3,7 +3,7 @@ version: 2.1
 
 orbs:
   terraform: twdps/terraform@dev:<<pipeline.git.revision>>
-  # orb-tools: circleci/orb-tools@12.0.4
+  op: twdps/onepassword@1.0.0
 
 globals:
   - &context orb-publishing
@@ -29,6 +29,14 @@ commands:
       - run:
           name: echo after-msg param
           command: echo "after - << parameters.msg >>"
+
+  set-environment:
+    steps:
+      - op/env:
+          env-file: op.env
+      - run:
+          name: set ~/.terraformrc
+          command: op inject -i terraformrc.tpl -o ~/.terraformrc
 
   create-terraform-workspace:
     steps:
@@ -124,12 +132,9 @@ workflows:
           snyk-version: installed
           snyk-organization: twdps
           checkov-version: installed
+          before-plan:
+            - set-environment
           after-terraform-init:
             - create-terraform-workspace
-          before-plan:
-            - before-job-message:
-                msg: Hello, before!
           after-plan:
             - delete-terraform-workspace
-            - after-job-message:
-                msg: Hello, after!
