@@ -56,8 +56,8 @@ parameters:
 
   tfe-token:
     description: terraform team-api token. Uses $TFE_TOKEN by default
-    type: string
-    default: $TFE_TOKEN
+    type: env_var_name
+    default: TFE_TOKEN
 
   tfc-organization:
     description: terraform cloud organization Name
