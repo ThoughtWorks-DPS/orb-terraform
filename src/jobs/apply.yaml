@@ -166,25 +166,8 @@ steps:
       command: |
         terraform apply \
           <<#parameters.terraform-var-file>> -var-file=<< parameters.terraform-var-file >> <</parameters.terraform-var-file>> \
-          <<#parameters.terraform-apply-additional-args>> << parameters.terraform-apply-additional-args >> <</parameters.terraform-apply-additional-args>>
-  - when:
-      name: run checkov scan of terraform source files
-      condition: << parameters.checkov-version >>
-      steps:
-        - checkov:
-            working-directory: << parameters.working-directory >>
-            checkov-additional-args: << parameters.checkov-additional-args >>
-            terraform-plan-outfile:  << parameters.terraform-plan-outfile >>
-  - when:
-      name: run Snyk IaC scan of terraform source files
-      condition: << parameters.snyk-version >>
-      steps:
-        - snyk:
-            working-directory: << parameters.working-directory >>
-            snyk-token: << parameters.snyk-token >>
-            snyk-organization: << parameters.snyk-organization >>
-            snyk-additional-args: << parameters.snyk-additional-args >>
-            terraform-plan-outfile:  << parameters.terraform-plan-outfile >>
+          <<#parameters.terraform-apply-additional-args>> << parameters.terraform-apply-additional-args >> <</parameters.terraform-apply-additional-args>> \
+          --auto-approve
   - when:
       name: Run after-apply lifecycle hook steps
       condition: << parameters.after-apply >>
