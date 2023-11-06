@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eo pipefail
 
 # download driftctl and verification packages
 curl -SLO "https://github.com/snyk/driftctl/releases/download/v${DRIFTCTL_VERSION}/driftctl_linux_amd64"

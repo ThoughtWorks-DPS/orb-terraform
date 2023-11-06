@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eo pipefail
 
 # download snyk and verification packages
 SNYK_SIGNING_KEY=A22665FB96CAB0E0973604C83676C4B8289C296E

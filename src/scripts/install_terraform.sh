@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eo pipefail
 
 # download and import HashiCorp public key
 curl --remote-name https://keybase.io/hashicorp/pgp_keys.asc

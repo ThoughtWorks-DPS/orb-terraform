@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+set -eo pipefail
 
 TFC_ORGANIZATION=twdps
-TFC_WORKSPACE=orb-terraform-di
+TFC_WORKSPACE=orb-terraform-ci
 
 # setup curl parameters
 tfc_api_url="https://app.terraform.io/api/v2/organizations"

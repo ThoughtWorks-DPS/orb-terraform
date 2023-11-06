@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eo pipefail
 
 echo "debug:"
 echo "TFC_ORGANIZATION $TFC_ORGANIZATION"

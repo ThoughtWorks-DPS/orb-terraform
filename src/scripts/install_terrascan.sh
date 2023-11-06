@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eo pipefail
 
 # download terrascan and verification packages
 curl -SLO "https://github.com/tenable/terrascan/releases/download/v${TERRASCAN_VERSION}/checksums.txt"
