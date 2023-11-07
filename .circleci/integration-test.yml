@@ -61,7 +61,7 @@ commands:
           
 jobs:
 
-  test packages command:
+  test packages:
     docker:
       - image: twdps/circleci-infra-aws:alpine-stable
     steps:
@@ -82,40 +82,40 @@ workflows:
 
   integration tests:
     jobs:
-      #- test packages command
+      - test packages
 
-      # - terraform/static-analysis:
-      #     context: *context
-      #     shell: *shell
-      #     working-directory: test
-      #     tflint-version: installed
-      #     tflint-provider: aws
-      #     tflint-additional-args: --format=compact --force
-      #     tfsec-version: installed
-      #     tfsec-additional-args: --exclude aws-ec2-no-excessive-port-access,aws-ec2-no-public-ingress-acl,aws-ec2-require-vpc-flow-logs-for-all-vpcs
-      #     trivy-version: installed
-      #     trivy-commandline-args: config . --exit-code 0
-      #     snyk-version: installed
-      #     snyk-organization: twdps
-      #     snyk-additional-args: --report --target-name=orb-terraform-ci
-      #     checkov-version: installed
-      #     checkov-additional-args: -d . --skip-check CKV_TF_1 
-      #     terrascan-version: installed
-      #     terrascan-custom-scan-args: -t aws -i terraform --output=yaml -d test/ --skip-rules="AC_AWS_0369"
-      #     driftctl-version: installed
-      #     driftctl-additional-args: --help
-      #     infracost-version: installed
-      #     infracost-additional-args: breakdown --path .
-      #     before-static-analysis:
-      #       - terraform/packages:
-      #           terrascan-version: 1.18.3
-      #           infracost-version: 0.10.29
-      #           trivy-version: 0.46.0
-      #       - before-job-message:
-      #           msg: Hello, before!
-      #     after-static-analysis:
-      #       - after-job-message:
-      #           msg: Hello, after!
+      - terraform/static-analysis:
+          context: *context
+          shell: *shell
+          working-directory: test
+          tflint-version: installed
+          tflint-provider: aws
+          tflint-additional-args: --format=compact --force
+          tfsec-version: installed
+          tfsec-additional-args: --exclude aws-ec2-no-excessive-port-access,aws-ec2-no-public-ingress-acl,aws-ec2-require-vpc-flow-logs-for-all-vpcs
+          trivy-version: installed
+          trivy-commandline-args: config . --exit-code 0
+          snyk-version: installed
+          snyk-organization: twdps
+          snyk-additional-args: --report --target-name=orb-terraform-ci
+          checkov-version: installed
+          checkov-additional-args: -d . --skip-check CKV_TF_1 
+          terrascan-version: installed
+          terrascan-custom-scan-args: -t aws -i terraform --output=yaml -d test/ --skip-rules="AC_AWS_0369"
+          driftctl-version: installed
+          driftctl-additional-args: --help
+          infracost-version: installed
+          infracost-additional-args: breakdown --path .
+          before-static-analysis:
+            - terraform/packages:
+                terrascan-version: 1.18.3
+                infracost-version: 0.10.29
+                trivy-version: 0.46.0
+            - before-job-message:
+                msg: Hello, before!
+          after-static-analysis:
+            - after-job-message:
+                msg: Hello, after!
 
       - terraform/plan:
           context: *context

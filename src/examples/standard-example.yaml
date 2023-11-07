@@ -44,8 +44,8 @@ usage:
 
   workflows:
     version: 2
-    my-pipeline:
 
+    development-build:
       jobs:
 
         - terraform/static-analysis:
@@ -53,7 +53,7 @@ usage:
             context: *context
             shell: *shell
             workspace: sandbox
-            terraforom-version: *terraform-version
+            terraform-version: *terraform-version
             tflint-version: installed
             tflint-provider: aws
             tflint-additional-args: --format=compact --force
@@ -63,7 +63,8 @@ usage:
             snyk-organization: twdps
             snyk-additional-args: --report --target-name=orb-terraform-ci
             before-static-analysis:
-              - set-environment
+              - set-environment:
+                  env: sandbox
             filter: *on-push-main
 
         - terraform/plan:
@@ -79,7 +80,8 @@ usage:
             snyk-organization: twdps
             snyk-additional-args: --report --target-name= my-pipeline-sandbox
             before-plan:
-              - set-environment
+              - set-environment:
+                  env: sandbox
             requires:
               - terraform static code analysis
             filters: *on-push-main
@@ -103,11 +105,14 @@ usage:
             snyk-organization: twdps
             snyk-additional-args: --report --target-name= my-pipeline-sandbox
             before-plan:
-              - set-environment
+              - set-environment:
+                  env: sandbox
             requires:
               - approve-sandbox-changes
             filters: *on-push-main
 
+    release:
+      jobs:
 
         - terraform/plan:
             name: plan changes for preview environment
@@ -122,7 +127,8 @@ usage:
             snyk-organization: twdps
             snyk-additional-args: --report --target-name= my-pipeline-preview
             before-plan:
-              - set-environment
+              - set-environment:
+                  env: preview
             requires:
               - terraform static code analysis
             filters: *on-tag-main
@@ -146,7 +152,8 @@ usage:
             snyk-organization: twdps
             snyk-additional-args: --report --target-name= my-pipeline-preview
             before-plan:
-              - set-environment
+              - set-environment:
+                  env: preview
             requires:
               - approve-preview-changes
             filters: *on-tag-main

@@ -7,9 +7,9 @@ description: Perform terrascan policy evaluation. Server mode not supported.
 parameters:
 
   working-directory:
-    description: specific folder in which to run the commands
+    description: Specific folder in which to run the commands.
     type: string
-    default: '.'
+    default: "."
 
   terrascan-init-args:
     description: Provide custom init command flags.
@@ -17,13 +17,13 @@ parameters:
     default: ""
 
   terrascan-iac-type:
-    description: terrascan iac provider types.
+    description: Terrascan iac provider types.
     type: enum
     enum: ["arm", "cft", "docker", "helm", "k8s", "kustomize", "terraform", "tfplan", ""]
     default: ""
 
   terrascan-policy-type:
-    description: terrascan preset policy types. Default is all.
+    description: Terrascan preset policy types. Default is all.
     type: enum
     enum: ["all", "aws", "azure", "docker", "gcp", "github", "k8s"]
     default: "all"
@@ -38,7 +38,9 @@ steps:
   - run:
       name: terrascan init
       working_directory: << parameters.working-directory >>
-      command: terrascan init << parameters.terrascan-init-args >>
+      command: |
+        terrascan version
+        terrascan init << parameters.terrascan-init-args >>
   - unless:
       condition: << parameters.terrascan-custom-scan-args >>
       working_directory: << parameters.working-directory >>

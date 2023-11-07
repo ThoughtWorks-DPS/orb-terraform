@@ -13,12 +13,12 @@ description: |
 parameters:
 
   working-directory:
-    description: specific folder in which to run the commands
+    description: Specific folder in which to run the commands.
     type: string
-    default: '.'
+    default: "."
 
   tflint-provider:
-    description: provider for tflint plugin
+    description: Provider plugin. Valid options are "aws", "azurerm", "google", "".
     type: enum
     enum: ["aws", "azurerm", "google", ""]
     default: ""

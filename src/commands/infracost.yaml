@@ -6,9 +6,9 @@ description: Run infracost analysis.
 parameters:
 
   working-directory:
-    description: specific folder in which to run the commands
+    description: Specific folder in which to run the commands.
     type: string
-    default: '.'
+    default: "."
 
   infracost-api-key:
     description: organization api key
@@ -16,7 +16,7 @@ parameters:
     default: INFRACOST_API_KEY
 
   infracost-additional-args:
-    description: Provide flag options to scan command.
+    description: Additional arguents to be passed to infracost.
     type: string
     default: ""
 

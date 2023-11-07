@@ -7,17 +7,17 @@ description: Basic checkov scan of terraform plan output json.
 parameters:
 
   working-directory:
-    description: specific folder in which to run the commands
+    description: Specific folder in which to run the commands.
     type: string
-    default: '.'
+    default: "."
 
   terraform-plan-outfile:
-    description: specify terraform plan output file for targeted scan
+    description: Specify terraform plan output file for targeted scan.
     type: string
     default: ""
 
   checkov-additional-args:
-    description: optional additional flags to be passed to checkov
+    description: Additional arguments to be passed to checkov.
     type: string
     default: "-d ."
 
@@ -28,11 +28,15 @@ steps:
       steps:
         - run:
             name: checkov scan of terraform plan output file
-            command: checkov -f << parameters.terraform-plan-outfile >> << parameters.checkov-additional-args >>
+            command: |
+              checkov --version
+              checkov -f << parameters.terraform-plan-outfile >> << parameters.checkov-additional-args >>
   - unless:
       condition: << parameters.terraform-plan-outfile >>
       working_directory: << parameters.working-directory >>
       steps:
         - run:
-            name: checkov scan of terraform plan output file
-            command: checkov << parameters.checkov-additional-args >>
+            name: checkov scan of terraform source files
+            command:  |
+              checkov --version
+              checkov << parameters.checkov-additional-args >>

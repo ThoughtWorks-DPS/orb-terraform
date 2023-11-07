@@ -6,12 +6,12 @@ description: Run tfsec against current working directory.
 parameters:
 
   working-directory:
-    description: specific folder in which to run the commands
+    description: Specific folder in which to run the commands.
     type: string
     default: '.'
 
   tfsec-additional-args:
-    description: optional additional flags
+    description: Additional arguents to be passed to tfsec.
     type: string
     default: ""
 

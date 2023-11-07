@@ -6,12 +6,12 @@ description: Run trivy scan.
 parameters:
 
   working-directory:
-    description: specific folder in which to run the commands
+    description: Specific folder in which to run the commands.
     type: string
     default: '.'
 
   trivy-commandline-args:
-    description: Provide trivy commandline arguments. Default is 'config . --exit code 1'
+    description: Provide trivy commandline arguments. Default is 'config . --exit code 1'.
     type: string
     default: "config . --exit-code 1"
 

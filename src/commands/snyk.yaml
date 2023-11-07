@@ -7,9 +7,9 @@ description: Snyk IaC scan of terraform source files
 parameters:
 
   working-directory:
-    description: specific folder in which to run the commands
+    description: Specific folder in which to run the commands.
     type: string
-    default: '.'
+    default: "."
 
   snyk-token:
     description: >
@@ -24,12 +24,12 @@ parameters:
     default: ""
 
   snyk-additional-args:
-    description: optional additional flags to be passed to Snyk IaC
+    description: Additional arguents to be passed to snyk.
     type: string
     default: ""
 
   terraform-plan-outfile:
-    description: specify terraform plan output file for targeted scan
+    description: Specify terraform plan output file for targeted scan.
     type: string
     default: ""
     
@@ -39,14 +39,16 @@ steps:
       working_directory: << parameters.working-directory >>
       steps:
         - run:
-            name: Run Snyk iac against terraform plan output json
+            name: run Snyk iac against terraform plan output json
             command: |
+              snyk version
               snyk iac test --org=<<parameters.snyk-organization>> << parameters.snyk-additional-args >> << parameters.terraform-plan-outfile >>
   - unless:
       condition: << parameters.terraform-plan-outfile >>
       working_directory: << parameters.working-directory >>
       steps:
         - run:
-            name: Run Snyk iac against terraform source files
+            name: run Snyk iac against terraform source files
             command: |
+              snyk version
               snyk iac test --org=<<parameters.snyk-organization>> << parameters.snyk-additional-args >> .
