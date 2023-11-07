@@ -65,17 +65,17 @@ workflows:
           requires:
             - publish development package
 
-  # release:
-  #   jobs:
-  #     - orb-tools/pack:
-  #         filters: *on-tag-main
+  release:
+    jobs:
+      - orb-tools/pack:
+          filters: *on-tag-main
 
-  #     - orb-tools/publish:
-  #         name: publish release version
-  #         context: *context
-  #         orb_name: *orb-name
-  #         vcs_type: << pipeline.project.type >>
-  #         pub_type: production
-  #         filters: *on-tag-main
-  #         requires:
-  #           - orb-tools/pack
+      - orb-tools/publish:
+          name: publish release version
+          context: *context
+          orb_name: *orb-name
+          vcs_type: << pipeline.project.type >>
+          pub_type: production
+          filters: *on-tag-main
+          requires:
+            - orb-tools/pack

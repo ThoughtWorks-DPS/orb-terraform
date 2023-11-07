@@ -6,6 +6,11 @@ description: |
   the twdps/terraform orb. An Infra Automation orb maintained by ThoughtWorks
   EMPC North America.
 
+  NOTE: v1.0.0 is a breaking change. In addition to expanded analysis the static
+  code analysis is a standalone job. While the prior major version supported
+  separate static-analysis-only as a plan option, this a now a required
+  pipeline format.
+
 display:
   source_url: "https://github.com/ThoughtWorks-DPS/orb-terraform"
   home_url: "https://github.com/ThoughtWorks-DPS/orb-terraform"
