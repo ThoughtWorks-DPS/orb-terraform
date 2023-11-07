@@ -28,16 +28,16 @@ workflows:
 
   static analysis and test:
     jobs:
-      # - orb-tools/lint:
-      #     filters: *on-push-main
+      - orb-tools/lint:
+          filters: *on-push-main
 
-      # - orb-tools/review:
-      #     max_command_length: 100
-      #     exclude: RC006,RC010,RC007,RC003
-      #     filters: *on-push-main
+      - orb-tools/review:
+          max_command_length: 100
+          exclude: RC006,RC010,RC007,RC003
+          filters: *on-push-main
 
-      # - shellcheck/check:
-      #     filters: *on-push-main
+      - shellcheck/check:
+          filters: *on-push-main
 
       - orb-tools/pack:
           filters: *on-push-main
@@ -49,9 +49,9 @@ workflows:
           vcs_type: << pipeline.project.type >>
           filters: *on-push-main
           requires:
-            # - orb-tools/lint
-            # - orb-tools/review
-            # - shellcheck/check
+            - orb-tools/lint
+            - orb-tools/review
+            - shellcheck/check
             - orb-tools/pack
 
       - orb-tools/continue:
