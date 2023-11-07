@@ -22,7 +22,7 @@ description: |
 
   Note: When using "installed" as package version, caplitalization
   is important.
-  
+
   When using your own custom executor, keep in mind that various
   package management dependencies will be required, and the install
   will use sudo since it assumes the executor container is running as

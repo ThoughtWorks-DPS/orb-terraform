@@ -37,6 +37,6 @@ steps:
       steps:
         - run:
             name: checkov scan of terraform source files
-            command:  |
+            command: |
               checkov --version
               checkov << parameters.checkov-additional-args >>

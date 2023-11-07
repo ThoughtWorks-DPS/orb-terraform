@@ -112,7 +112,7 @@ parameters:
     default: -backend=false
 
   terraform-destroy-additional-args:
-    description:  |
+    description: |
       Include any additional terraform destroy command arguments. Can be used in conjunction with
       terraform-var-file parameter or an override.
     type: string
@@ -122,7 +122,7 @@ parameters:
     description: Include terraform -var-file parameter.
     type: string
     default: ""
-    
+
   after-terraform-init:
     description: |
       Optional steps to run after terraform init but before running terraform plan.
