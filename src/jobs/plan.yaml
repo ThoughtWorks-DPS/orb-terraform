@@ -112,7 +112,7 @@ parameters:
     default: ""
 
   terraform-plan-additional-args:
-    description:  |
+    description: |
       Include any additional terraform plan command arguments. Can be used in conjunction with
       terraform-var-file parameter or an override.
     type: string
@@ -122,7 +122,7 @@ parameters:
     description: Include terraform -var-file parameter.
     type: string
     default: ""
-    
+
   terraform-plan-outfile:
     description: Filename for output results from terraform plan.
     type: string
@@ -228,7 +228,7 @@ steps:
         - checkov:
             working-directory: << parameters.working-directory >>
             checkov-additional-args: << parameters.checkov-additional-args >>
-            terraform-plan-outfile:  << parameters.terraform-plan-outfile >>
+            terraform-plan-outfile: << parameters.terraform-plan-outfile >>
   - when:
       name: run Snyk IaC scan of terraform source files
       condition: << parameters.snyk-version >>
@@ -238,7 +238,7 @@ steps:
             snyk-token: << parameters.snyk-token >>
             snyk-organization: << parameters.snyk-organization >>
             snyk-additional-args: << parameters.snyk-additional-args >>
-            terraform-plan-outfile:  << parameters.terraform-plan-outfile >>
+            terraform-plan-outfile: << parameters.terraform-plan-outfile >>
   - when:
       name: Run after-plan lifecycle hook steps
       condition: << parameters.after-plan >>

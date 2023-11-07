@@ -32,7 +32,7 @@ parameters:
     description: Specify terraform plan output file for targeted scan.
     type: string
     default: ""
-    
+
 steps:
   - when:
       condition: << parameters.terraform-plan-outfile >>

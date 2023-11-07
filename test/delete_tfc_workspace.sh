@@ -17,4 +17,4 @@ deleteworkspace=$(curl --header "${headers[0]}" \
                         --header "${headers[1]}" \
                         --request DELETE \
                         "$tfc_api_url_workspace_by_name")
-echo $deleteworkspace
+echo "$deleteworkspace"
