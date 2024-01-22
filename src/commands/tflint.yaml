@@ -17,6 +17,14 @@ parameters:
     type: string
     default: "."
 
+  tflint-version:
+    description: |
+      Providing a tflint version results in a tflint scan of the repo using
+      the desired version. Specify version "installed" to use the version
+      already installed on the executor.
+    type: string
+    default: ""
+
   tflint-provider:
     description: Provider plugin. Valid options are "aws", "azurerm", "google", "".
     type: enum
@@ -39,7 +47,14 @@ steps:
             name: set tflint provider unless custom configuration file is present
             command: |
               if [[ ! -f ".tflint.hcl" ]]; then
-                echo "plugin \"<< parameters.tflint-provider >>\" { enabled = true }" > .tflint.hcl
+                export ver=$(curl  "https://api.github.com/repos/terraform-linters/tflint-ruleset-aws/tags" | jq -r '.[0].name' | grep -Eo '[0-9]\.[0-9]+\.[0-9]+')
+                cat <<EOF > .tflint.hcl
+                plugin "aws" {
+                    enabled = true
+                    version = "$ver"
+                    source  = "github.com/terraform-linters/tflint-ruleset-aws"
+                }
+                EOF
               else
                 echo "Provider not defined because .tflint.hcl already exists in working directory"
               fi
