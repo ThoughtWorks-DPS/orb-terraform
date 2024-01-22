@@ -161,7 +161,7 @@ parameters:
     description: Perform checkov scan of terraform plan.
     type: boolean
     default: false
-    
+
   checkov-version:
     description: |
       Providing a tflint version results in a checkov scan of the repo using

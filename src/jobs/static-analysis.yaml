@@ -270,7 +270,7 @@ parameters:
     description: Perform infracost scan of terraform resources.
     type: boolean
     default: false
-    
+
   infracost-version:
     description: |
       Providing a infracost version results in a infracost scan of the repo using
