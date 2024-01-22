@@ -3,37 +3,26 @@ version: 2.1
 
 orbs:
   terraform: twdps/terraform@dev:<<pipeline.git.revision>>
-  op: twdps/onepassword@1.0.0
+  op: twdps/onepassword@2.0.6
 
 globals:
   - &context orb-publishing
-  - &orb-name twdps/terraform
   - &shell op run --env-file op.env -- /bin/bash -eo pipefail
 
 commands:
 
-  before-job-message:
+  echo-message:
     parameters:
       msg:
         type: string
     steps:
       - run:
-          name: echo before-msg
-          command: echo "before - << parameters.msg >>"
-
-  after-job-message:
-    parameters:
-      msg:
-        type: string
-    steps:
-      - run:
-          name: echo after-msg param
-          command: echo "after - << parameters.msg >>"
+          name: echo msg
+          command: echo "<< parameters.msg >>"
 
   set-environment:
     steps:
-      - op/env:
-          env-file: op.env
+      - op/env
       - run:
           name: set ~/.terraformrc
           command: op inject -i test/terraformrc.tpl -o ~/.terraformrc
@@ -78,7 +67,6 @@ jobs:
           infracost-version: 0.10.29
 
 workflows:
-  version: 2
 
   integration tests:
     jobs:
@@ -88,36 +76,35 @@ workflows:
           context: *context
           shell: *shell
           working-directory: test
+          tflint-scan: true
           tflint-version: installed
           tflint-provider: aws
           tflint-additional-args: --format=compact --force
-          tfsec-version: installed
-          tfsec-additional-args: --exclude aws-ec2-no-excessive-port-access,aws-ec2-no-public-ingress-acl,aws-ec2-require-vpc-flow-logs-for-all-vpcs
+          trivy-scan: true
           trivy-version: installed
           trivy-commandline-args: config . --exit-code 0
+          snyk-scan: true
           snyk-version: installed
           snyk-organization: twdps
           snyk-additional-args: --report --target-name=orb-terraform-ci
+          checkov-scan: true
           checkov-version: installed
-          checkov-additional-args: -d . --skip-check CKV_TF_1 
+          checkov-additional-args: -d . --skip-check CKV_TF_1
+          terrascan-scan: true
           terrascan-version: installed
           terrascan-custom-scan-args: -t aws -i terraform --output=yaml -d test/ --skip-rules="AC_AWS_0369"
+          driftctl-scan: true
           driftctl-version: installed
           driftctl-additional-args: --help
+          infracost-scan: true
           infracost-version: installed
           infracost-additional-args: breakdown --path .
           before-static-analysis:
-            - terraform/packages:
-                terrascan-version: 1.18.3
-                infracost-version: 0.10.29
-                trivy-version: 0.46.0
-            - before-job-message:
+            - echo-message:
                 msg: Hello, before!
           after-static-analysis:
-            - after-job-message:
+            - echo-message:
                 msg: Hello, after!
-          requires:
-            - test packages
 
       - terraform/plan:
           context: *context
@@ -129,15 +116,18 @@ workflows:
           tfe-token: TFE_TOKEN
           terraform-var-file: ci.tfvars.json
           terraform-plan-outfile: ~/project/test/tfplan.json
+          checkov-scan: true
           checkov-version: installed
           checkov-additional-args: --soft-fail
           before-plan:
             - set-environment
             - create-terraform-workspace
+            - echo-message:
+                msg: Hello, before plan!
           after-terraform-init:
-            - after-job-message:
+            - echo-message:
                 msg: Hello, after init!
           after-plan:
+            - echo-message:
+                msg: Hello, after plan!
             - delete-terraform-workspace
-          requires:
-            - test packages

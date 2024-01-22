@@ -9,7 +9,6 @@ description: >
   Supported tools:
   - terraform validate and fmt (default)
   - tflint
-  - tfsec
   - trivy
   - checkov
   - snyk
@@ -64,7 +63,7 @@ parameters:
   resource-class:
     description: Executor resource size. Default is medium.
     type: enum
-    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    enum: [medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
     default: medium
 
   shell:
@@ -96,6 +95,11 @@ parameters:
       Default is -backend=false.
     type: string
     default: -backend=false
+
+  tflint-scan:
+    description: perform tflint analysis of terraform files
+    type: boolean
+    default: true
 
   tflint-version:
     description: |
@@ -142,6 +146,11 @@ parameters:
     type: string
     default: ""
 
+  trivy-scan:
+    description: perform trivy scan
+    type: boolean
+    default: false
+
   trivy-version:
     description: |
       Providing a trivy version results in a trivy scan of the repo using
@@ -155,6 +164,11 @@ parameters:
       Provide trivy commandline arguments. Default is 'config . --exit code 1'
     type: string
     default: "config . --exit-code 1"
+
+  snyk-scan:
+    description: Perform snyk scan of terraform files.
+    type: boolean
+    default: false
 
   snyk-version:
     description: |
@@ -180,6 +194,11 @@ parameters:
     type: string
     default: ""
 
+  checkov-scan:
+    description: Perform checkov scan of terraform files.
+    type: boolean
+    default: false
+
   checkov-version:
     description: |
       Providing a checkov version results in a checkov scan of the repo using
@@ -192,6 +211,11 @@ parameters:
     description: Optional additional flags to be passed to checkov.
     type: string
     default: ""
+
+  terrascan-scan:
+    description: Perform terrascan scan of terraform files.
+    type: boolean
+    default: false
 
   terrascan-version:
     description: |
@@ -224,6 +248,11 @@ parameters:
     type: string
     default: ""
 
+  driftctl-scan:
+    description: Perform driftctl scan of terraform source and state.
+    type: boolean
+    default: false
+
   driftctl-version:
     description: |
       Providing a driftctl version results in a driftctl scan of the repo using
@@ -237,6 +266,11 @@ parameters:
     type: string
     default: ""
 
+  infracost-scan:
+    description: Perform infracost scan of terraform resources.
+    type: boolean
+    default: false
+    
   infracost-version:
     description: |
       Providing a infracost version results in a infracost scan of the repo using
@@ -276,7 +310,6 @@ steps:
   - packages:
       terraform-version: << parameters.terraform-version >>
       tflint-version: << parameters.tflint-version >>
-      tfsec-version: << parameters.tfsec-version >>
       trivy-version: << parameters.trivy-version >>
       checkov-version: << parameters.checkov-version >>
       snyk-version: << parameters.snyk-version >>
@@ -297,36 +330,29 @@ steps:
             working-directory: << parameters.working-directory >>
   - when:
       name: perform tflint scan of terraform source files
-      condition: << parameters.tflint-version >>
+      condition: << parameters.tflint-scan >>
       steps:
         - tflint:
             working-directory: << parameters.working-directory >>
             tflint-provider: << parameters.tflint-provider >>
             tflint-additional-args: << parameters.tflint-additional-args >>
   - when:
-      name: perform tfsec scan of terraform source files
-      condition: << parameters.tfsec-version >>
-      steps:
-        - tfsec:
-            working-directory: << parameters.working-directory >>
-            tfsec-additional-args: << parameters.tfsec-additional-args >>
-  - when:
       name: perform trivy scan of terraform source files
-      condition: << parameters.tfsec-version >>
+      condition: << parameters.trivy-scan >>
       steps:
         - trivy:
             working-directory: << parameters.working-directory >>
             trivy-commandline-args: << parameters.trivy-commandline-args >>
   - when:
       name: run checkov scan of terraform source files
-      condition: << parameters.checkov-version >>
+      condition: << parameters.checkov-scan >>
       steps:
         - checkov:
             working-directory: << parameters.working-directory >>
             checkov-additional-args: << parameters.checkov-additional-args >>
   - when:
       name: run Snyk IaC scan of terraform source files
-      condition: << parameters.snyk-version >>
+      condition: << parameters.snyk-scan >>
       steps:
         - snyk:
             working-directory: << parameters.working-directory >>
@@ -335,7 +361,7 @@ steps:
             snyk-additional-args: << parameters.snyk-additional-args >>
   - when:
       name: run terrascan on repository files
-      condition: << parameters.terrascan-version >>
+      condition: << parameters.terrascan-scan >>
       steps:
         - terrascan:
             working-directory: << parameters.working-directory >>
@@ -345,14 +371,14 @@ steps:
             terrascan-custom-scan-args: << parameters.terrascan-custom-scan-args >>
   - when:
       name: run driftctl scan
-      condition: << parameters.driftctl-version >>
+      condition: << parameters.driftctl-scan >>
       steps:
         - driftctl:
             working-directory: << parameters.working-directory >>
             driftctl-additional-args: << parameters.driftctl-additional-args >>
   - when:
       name: run infracost analysis
-      condition: << parameters.infracost-version >>
+      condition: << parameters.infracost-scan >>
       steps:
         - infracost:
             working-directory: << parameters.working-directory >>
