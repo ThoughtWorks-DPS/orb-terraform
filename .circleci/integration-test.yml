@@ -99,6 +99,9 @@ workflows:
           infracost-version: installed
           infracost-additional-args: breakdown --path .
           before-static-analysis:
+            - terraform/packages:
+                terrascan-version: 1.18.3
+                infracost-version: 0.10.29
             - echo-message:
                 msg: Hello, before!
           after-static-analysis:
