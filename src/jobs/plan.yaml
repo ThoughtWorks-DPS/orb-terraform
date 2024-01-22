@@ -42,7 +42,7 @@ parameters:
   working-directory:
     description: Specific folder in which to run the commands.
     type: string
-    default: '.'
+    default: "."
 
   workspace:
     description: Terraform workspace infrastructure environment.
