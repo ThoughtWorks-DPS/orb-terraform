@@ -36,7 +36,7 @@ steps:
       working_directory: << parameters.working-directory >>
       steps:
         - run:
-            name: set tflint provider plug
+            name: set tflint provider plugin
             environment:
               PROVIDER: << parameters.tflint-provider >>
             command: <<include(scripts/set_tflint_provider.sh)>>
