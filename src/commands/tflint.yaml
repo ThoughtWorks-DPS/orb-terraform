@@ -39,7 +39,7 @@ steps:
             name: set tflint provider plug
             environment:
               PROVIDER: << parameters.tflint-provider >>
-            command: <<include(scripts/install_infracost.sh)>>
+            command: <<include(scripts/set_tflint_provider.sh)>>
   - run:
       name: tflint scan of terraform files
       working_directory: << parameters.working-directory >>
