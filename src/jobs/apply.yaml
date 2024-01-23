@@ -1,7 +1,6 @@
 # /src/jobs/apply.yaml
 # yamllint disable rule:line-length
 ---
-
 description: >
   Terraform apply workflow.
 
@@ -48,21 +47,6 @@ parameters:
     type: string
     default: ""
 
-  tfc-workspace:
-    description: Create and/or set local-mode workspace.
-    type: string
-    default: ""
-
-  tfe-token:
-    description: Terraform team-api token. Uses $TFE_TOKEN by default.
-    type: env_var_name
-    default: TFE_TOKEN
-
-  tfc-organization:
-    description: Terraform cloud organization name.
-    type: string
-    default: ""
-
   executor-image:
     description: |
       Available override. Default is docker.io/twdps/circleci-infra-aws:alpine-stable.
@@ -86,7 +70,7 @@ parameters:
   resource-class:
     description: Executor resource size. Default is medium.
     type: enum
-    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    enum: [medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
     default: medium
 
   shell:

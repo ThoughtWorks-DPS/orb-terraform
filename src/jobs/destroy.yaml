@@ -1,7 +1,6 @@
 # /src/jobs/destroy.yaml
 # yamllint disable rule:line-length
 ---
-
 description: >
   Terraform destroy workflow.
 
@@ -45,21 +44,6 @@ parameters:
 
   workspace:
     description: Terraform workspace infrastructure environment.
-    type: string
-    default: ""
-
-  tfc-workspace:
-    description: Create and/or set local-mode workspace.
-    type: string
-    default: ""
-
-  tfe-token:
-    description: Terraform team-api token. Uses $TFE_TOKEN by default.
-    type: env_var_name
-    default: TFE_TOKEN
-
-  tfc-organization:
-    description: Terraform cloud organization name.
     type: string
     default: ""
 

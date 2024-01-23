@@ -87,7 +87,7 @@ parameters:
   resource-class:
     description: Executor resource size. Default is medium.
     type: enum
-    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    enum: [medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
     default: medium
 
   shell:
