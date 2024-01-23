@@ -1,4 +1,3 @@
-
 ignore:
   SNYK-CC-AWS-415:
     - '*':
