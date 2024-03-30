@@ -65,7 +65,7 @@ jobs:
           driftctl-version: 0.39.0
           infracost-version: 0.10.29
 
-  test-terraformrc:
+  test terraformrc:
     docker:
       - image: twdps/circleci-infra-aws:alpine-stable
     steps:
@@ -86,6 +86,7 @@ workflows:
   integration tests:
     jobs:
       - test packages
+      - test terraformrc
 
       - terraform/static-analysis:
           context: *context
