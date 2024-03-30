@@ -76,7 +76,7 @@ jobs:
           name: validate ~/.terraformrc file
           command: |
             filesize=$(cat ~/.terraformrc | wc -c)
-            if [[ $filesize < 50 ]]; then
+            if [[ $filesize -lt 50 ]]; then
               echo ".terraformrc template failure"
               exit 1
             fi
