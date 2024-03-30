@@ -86,7 +86,9 @@ workflows:
   integration tests:
     jobs:
       - test packages
-      - test terraformrc
+
+      - test terraformrc:
+          context: *context
 
       - terraform/static-analysis:
           context: *context
