@@ -5,9 +5,9 @@ description: set contents of ~/.terraformrc from TFE_TOKEN environment variable.
 
 steps:
   - run:
-      name:  set contents of ~/.terraformrc
+      name: set contents of ~/.terraformrc
       command: |
-        cat <<EOF > ~/.terraformrc
+        cat \<<EOF > ~/.terraformrc
           credentials "app.terraform.io" {
             token = "${TFE_TOKEN}"
           }
