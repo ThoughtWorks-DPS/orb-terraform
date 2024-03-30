@@ -47,7 +47,7 @@ commands:
       - run:
           name: delete terraform workspace
           command: bash test/delete_tfc_workspace.sh
-          
+
 jobs:
 
   test packages:
@@ -64,6 +64,22 @@ jobs:
           terrascan-version: 1.18.3
           driftctl-version: 0.39.0
           infracost-version: 0.10.29
+
+  test-terraformrc:
+    docker:
+      - image: twdps/circleci-infra-aws:alpine-stable
+    steps:
+      - checkout
+      - op/env
+      - terraform/terraformrc
+      - run:
+          name: validate ~/.terraformrc file
+          command: |
+            filesize=$(cat ~/.terraformrc | wc -c)
+            if [[ $filesize < 50 ]]; then
+              echo ".terraformrc template failure"
+              exit 1
+            fi
 
 workflows:
 
