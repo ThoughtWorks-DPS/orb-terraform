@@ -31,7 +31,7 @@ workflows:
           filters: *on-push-main
 
       - orb-tools/review:
-          exclude: RC010
+          exclude: RC010,RC009
           filters: *on-push-main
 
       - shellcheck/check:

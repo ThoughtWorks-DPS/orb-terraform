@@ -81,7 +81,7 @@ steps:
             environment:
               TFLINT_VERSION: << parameters.tflint-version >>
             command: <<include(scripts/install_tflint.sh)>>
-  
+
   - when:
       condition: << parameters.trivy-version >>
       steps:
@@ -90,7 +90,7 @@ steps:
             environment:
               TRIVY_VERSION: << parameters.trivy-version >>
             command: <<include(scripts/install_trivy.sh)>>
-  
+
   - when:
       condition: << parameters.checkov-version >>
       steps:
