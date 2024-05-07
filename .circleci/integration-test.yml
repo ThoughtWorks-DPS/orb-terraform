@@ -23,7 +23,7 @@ commands:
   set-environment:
     steps:
       - op/env
-      - terrraform/terraformrc
+      - terraform/terraformrc
 
   create-terraform-workspace:
     steps:
