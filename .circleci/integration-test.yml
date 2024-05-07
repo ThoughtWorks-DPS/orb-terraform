@@ -3,7 +3,7 @@ version: 2.1
 
 orbs:
   terraform: twdps/terraform@dev:<<pipeline.git.revision>>
-  op: twdps/onepassword@2.0.6
+  op: twdps/onepassword@3.0.0
 
 globals:
   - &context orb-publishing
@@ -23,9 +23,7 @@ commands:
   set-environment:
     steps:
       - op/env
-      - run:
-          name: set ~/.terraformrc
-          command: op inject -i test/terraformrc.tpl -o ~/.terraformrc
+      - terrraform/terraformrc
 
   create-terraform-workspace:
     steps:
@@ -50,20 +48,30 @@ commands:
 
 jobs:
 
-  test packages:
+  test package install:
     docker:
       - image: twdps/circleci-infra-aws:alpine-stable
     steps:
       - checkout
       - terraform/packages:
-          terraform-version: 1.6.0
-          tflint-version: 0.48.0
-          trivy-version: 0.46.0
-          checkov-version: 2.5.13
-          snyk-version: 1.1236.0
+          terraform-version: 1.8.2
+          tflint-version: 0.50.3
+          trivy-version: 0.50.4
+          checkov-version: 3.2.70
+          snyk-version: 1.1291.0
           terrascan-version: 1.18.3
-          driftctl-version: 0.39.0
           infracost-version: 0.10.29
+      - run:
+          name: confirm installed version
+          command: |
+            set -exo pipefail
+            terraform -v | grep "1.8.2"
+            tflint -v | grep "0.50.3"
+            trivy -v | grep "50.4"
+            checkov -v | grep "3.2.70"
+            snyk -v | grep "1.1291.0"
+            terrascan version | grep "1.18.3"
+            infracost --version | grep "0.10.29"
 
   test terraformrc:
     docker:
@@ -85,7 +93,7 @@ workflows:
 
   integration tests:
     jobs:
-      - test packages
+      - test package install
 
       - test terraformrc:
           context: *context
@@ -95,30 +103,21 @@ workflows:
           shell: *shell
           working-directory: test
           tflint-scan: true
-          tflint-version: installed
           tflint-provider: aws
           tflint-additional-args: --format=compact --force
           trivy-scan: true
-          trivy-version: installed
           trivy-commandline-args: config . --exit-code 0
           snyk-scan: true
-          snyk-version: installed
           snyk-organization: twdps
           snyk-additional-args: --report --target-name=orb-terraform-ci
           checkov-scan: true
-          checkov-version: installed
           checkov-additional-args: -d . --skip-check CKV_TF_1
           terrascan-scan: true
-          terrascan-version: installed
           terrascan-custom-scan-args: -t aws -i terraform --output=yaml -d test/ --skip-rules="AC_AWS_0369"
-          driftctl-scan: true
-          driftctl-version: installed
-          driftctl-additional-args: --help
           infracost-scan: true
-          infracost-version: installed
           infracost-additional-args: breakdown --path .
           before-static-analysis:
-            - terraform/packages:
+            - terraform/install:
                 terrascan-version: 1.18.3
                 infracost-version: 0.10.29
             - echo-message:
@@ -138,7 +137,6 @@ workflows:
           terraform-var-file: ci.tfvars.json
           terraform-plan-outfile: ~/project/test/tfplan.json
           checkov-scan: true
-          checkov-version: installed
           checkov-additional-args: --soft-fail
           before-plan:
             - set-environment

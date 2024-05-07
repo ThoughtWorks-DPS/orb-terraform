@@ -1,4 +1,4 @@
-# src/commands/infracost.yaml
+# src/commands/infracost.yml
 ---
 
 description: Run infracost analysis.

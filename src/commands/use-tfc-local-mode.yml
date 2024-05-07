@@ -1,4 +1,4 @@
-# src/commands/create-tfc-workspace.yaml
+# src/commands/create-tfc-workspace.yml
 # yamllint disable rule:line-length
 ---
 description: |

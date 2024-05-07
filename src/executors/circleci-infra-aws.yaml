@@ -1,4 +1,4 @@
-# src/executors/circleci-infra-aws.yaml
+# src/executors/circleci-infra-aws.yml
 # yamllint disable rule:line-length
 ---
 

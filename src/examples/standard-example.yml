@@ -1,4 +1,4 @@
-# src/examples/standard-example.yaml
+# src/examples/standard-example.yml
 # yamllint disable rule:line-length
 ---
 description: Standard usage of the twdps/terraform orb workflow jobs
@@ -7,12 +7,12 @@ usage:
   version: 2.1
 
   orbs:
-    terraform: twdps/terraform@1.0.0
+    terraform: twdps/terraform@3.0.0
 
   globals:
     - &context my-team
     - &shell op run --env-file op.env -- /bin/bash -eo pipefail
-    - &terraform-version 1.6.2
+    - &terraform-version 1.8.2
 
   on-push-main: &on-push-main
     branches:
@@ -53,15 +53,9 @@ usage:
             context: *context
             shell: *shell
             workspace: sandbox
-            terraform-version: *terraform-version
-            tflint-version: installed
             tflint-provider: aws
             tflint-additional-args: --format=compact --force
-            tfsec-version: installed
-            tfsec-additional-args: --exclude aws-ec2-no-excessive-port-access,aws-ec2-no-public-ingress-acl,aws-ec2-require-vpc-flow-logs-for-all-vpcs
-            snyk-version: installed
-            snyk-organization: twdps
-            snyk-additional-args: --report --target-name=orb-terraform-ci
+            trivy-scan: true
             before-static-analysis:
               - set-environment:
                   env: sandbox
@@ -76,7 +70,6 @@ usage:
             tfc-organization: twdps
             tfe-token: TFE_TOKEN
             terraform-var-file: environments/sandbox.tfvars.json
-            snyk-version: installed
             snyk-organization: twdps
             snyk-additional-args: --report --target-name= my-pipeline-sandbox
             before-plan:
@@ -97,13 +90,7 @@ usage:
             context: *context
             shell: *shell
             workspace: sandbox
-            tfc-workspace: my-pipeline-sandbox
-            tfc-organization: twdps
-            tfe-token: TFE_TOKEN
             terraform-var-file: environments/sandbox.tfvars.json
-            snyk-version: installed
-            snyk-organization: twdps
-            snyk-additional-args: --report --target-name= my-pipeline-sandbox
             before-plan:
               - set-environment:
                   env: sandbox
@@ -123,7 +110,6 @@ usage:
             tfc-organization: twdps
             tfe-token: TFE_TOKEN
             terraform-var-file: environments/preview.tfvars.json
-            snyk-version: installed
             snyk-organization: twdps
             snyk-additional-args: --report --target-name= my-pipeline-preview
             before-plan:
@@ -144,13 +130,7 @@ usage:
             context: *context
             shell: *shell
             workspace: preview
-            tfc-workspace: my-pipeline-preview
-            tfc-organization: twdps
-            tfe-token: TFE_TOKEN
             terraform-var-file: environments/preview.tfvars.json
-            snyk-version: installed
-            snyk-organization: twdps
-            snyk-additional-args: --report --target-name= my-pipeline-preview
             before-plan:
               - set-environment:
                   env: preview

@@ -1,4 +1,4 @@
-# /src/jobs/apply.yaml
+# /src/jobs/apply.yml
 # yamllint disable rule:line-length
 ---
 description: >
@@ -131,7 +131,7 @@ steps:
       condition: << parameters.before-apply >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-apply >>
-  - packages:
+  - install:
       terraform-version: << parameters.terraform-version >>
   - run:
       name: terraform init

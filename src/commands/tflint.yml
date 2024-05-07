@@ -1,4 +1,4 @@
-# src/commands/tflint.yaml
+# src/commands/tflint.yml
 # yamllint disable rule:line-length
 ---
 

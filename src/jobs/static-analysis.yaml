@@ -1,4 +1,4 @@
-# /src/jobs/static-analysis.yaml
+# /src/jobs/static-analysis.yml
 # yamllint disable rule:line-length
 ---
 
@@ -13,7 +13,6 @@ description: >
   - checkov
   - snyk
   - terrascan
-  - driftctl
   - infracost
 
   Note: The default executor image in this job is effectively set to Latest.
@@ -138,21 +137,6 @@ parameters:
     type: string
     default: ""
 
-  tfsec-version:
-    description: |
-      Providing a tfsec version results in a tfsec scan of the repo using
-      the desired version. Specify version "installed" to use the version
-      already installed on the executor.
-    type: string
-    default: ""
-
-  tfsec-additional-args:
-    description: |
-      Include any additional tfsec commandline arguments. Note: not all
-      options have been tested in pipeline setting.
-    type: string
-    default: ""
-
   trivy-scan:
     description: perform trivy scan
     type: boolean
@@ -255,24 +239,6 @@ parameters:
     type: string
     default: ""
 
-  driftctl-scan:
-    description: Perform driftctl scan of terraform source and state.
-    type: boolean
-    default: false
-
-  driftctl-version:
-    description: |
-      Providing a driftctl version results in a driftctl scan of the repo using
-      the desired version. Specify version "installed" to use the version
-      already installed on the executor.
-    type: string
-    default: ""
-
-  driftctl-additional-args:
-    description: Provide flag options to scan command.
-    type: string
-    default: ""
-
   infracost-scan:
     description: Perform infracost scan of terraform resources.
     type: boolean
@@ -314,14 +280,13 @@ steps:
       condition: << parameters.before-static-analysis >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-static-analysis >>
-  - packages:
+  - install:
       terraform-version: << parameters.terraform-version >>
       tflint-version: << parameters.tflint-version >>
       trivy-version: << parameters.trivy-version >>
       checkov-version: << parameters.checkov-version >>
       snyk-version: << parameters.snyk-version >>
       terrascan-version: << parameters.terrascan-version >>
-      driftctl-version: << parameters.driftctl-version >>
       infracost-version: << parameters.infracost-version >>
   - run:
       name: terraform init
@@ -376,13 +341,6 @@ steps:
             terrascan-iac-type: << parameters.terrascan-iac-type >>
             terrascan-policy-type: << parameters.terrascan-policy-type >>
             terrascan-custom-scan-args: << parameters.terrascan-custom-scan-args >>
-  - when:
-      name: run driftctl scan
-      condition: << parameters.driftctl-scan >>
-      steps:
-        - driftctl:
-            working-directory: << parameters.working-directory >>
-            driftctl-additional-args: << parameters.driftctl-additional-args >>
   - when:
       name: run infracost analysis
       condition: << parameters.infracost-scan >>

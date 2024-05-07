@@ -1,4 +1,5 @@
-# src/commands/validate.yaml
+# src/commands/validate.yml
+# yamllint disable rule:line-length
 ---
 
 description: Confirm canonical format and validate terraform syntax.

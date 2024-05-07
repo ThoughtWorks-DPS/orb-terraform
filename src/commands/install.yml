@@ -1,0 +1,128 @@
+# src/commands/install.yml
+# yamllint disable rule:line-length
+---
+
+description: |
+  Install specified package versions on executor for orb dependencies.
+  This is optional with the use of a twdps/circleci-infra-aws convenience
+  image. Each package-version parameter below can be used to install
+  a specific version of the named package. If left blank the command will
+  not attempt to install anything.
+
+  Supported packages:
+  - terraform
+  - tflint
+  - trivy
+  - checkov
+  - snyk
+  - terrascan
+  - infracost
+
+  When not using the twdps/circleci-infra-aws convenience image, keep in mind
+  that various package management dependencies will be required, and the
+  install will use sudo since it assumes the executor container is running as
+  a defined USER.
+
+  Package management dependencies:
+  - curl
+  - unzip
+  - pip
+  - gnupg(gpg)
+  - shasum
+  - cosign
+  - python/pip
+
+parameters:
+
+  terraform-version:
+    type: string
+    default: ""
+
+  tflint-version:
+    type: string
+    default: ""
+
+  trivy-version:
+    type: string
+    default: ""
+
+  checkov-version:
+    type: string
+    default: ""
+
+  snyk-version:
+    type: string
+    default: ""
+
+  terrascan-version:
+    type: string
+    default: ""
+
+  infracost-version:
+    type: string
+    default: ""
+
+steps:
+
+  - when:
+      condition: << parameters.terraform-version >>
+      steps:
+        - run:
+            name: install terraform version << parameters.terraform-version >>
+            environment:
+              TERRAFORM_VERSION: << parameters.terraform-version >>
+            command: <<include(scripts/install_terraform.sh)>>
+
+  - when:
+      condition: << parameters.tflint-version >>
+      steps:
+        - run:
+            name: install tflint version << parameters.tflint-version >>
+            environment:
+              TFLINT_VERSION: << parameters.tflint-version >>
+            command: <<include(scripts/install_tflint.sh)>>
+  
+  - when:
+      condition: << parameters.trivy-version >>
+      steps:
+        - run:
+            name: install trivy version << parameters.trivy-version >>
+            environment:
+              TRIVY_VERSION: << parameters.trivy-version >>
+            command: <<include(scripts/install_trivy.sh)>>
+  
+  - when:
+      condition: << parameters.checkov-version >>
+      steps:
+        - run:
+            name: install checkov version << parameters.checkov-version >>
+            environment:
+              CHECKOV_VERSION: << parameters.checkov-version >>
+            command: <<include(scripts/install_checkov.sh)>>
+
+  - when:
+      condition: << parameters.snyk-version >>
+      steps:
+        - run:
+            name: install snyk version << parameters.snyk-version >>
+            environment:
+              SNYK_VERSION: << parameters.snyk-version >>
+            command: <<include(scripts/install_snyk.sh)>>
+
+  - when:
+      condition: << parameters.terrascan-version >>
+      steps:
+        - run:
+            name: install terrascan version << parameters.terrascan-version >>
+            environment:
+              TERRASCAN_VERSION: << parameters.terrascan-version >>
+            command: <<include(scripts/install_terrascan.sh)>>
+
+  - when:
+      condition: << parameters.infracost-version >>
+      steps:
+        - run:
+            name: install infracost version << parameters.infracost-version >>
+            environment:
+              INFRACOST_VERSION: << parameters.infracost-version >>
+            command: <<include(scripts/install_infracost.sh)>>

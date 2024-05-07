@@ -1,4 +1,4 @@
-# /src/jobs/plan.yaml
+# /src/jobs/plan.yml
 # yamllint disable rule:line-length
 ---
 
@@ -199,7 +199,7 @@ steps:
       condition: << parameters.before-plan >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-plan >>
-  - packages:
+  - install:
       terraform-version: << parameters.terraform-version >>
       checkov-version: << parameters.checkov-version >>
       snyk-version: << parameters.snyk-version >>

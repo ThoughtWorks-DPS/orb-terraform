@@ -1,4 +1,5 @@
-# src/commands/terrafromrc.yaml
+# src/commands/terrafromrc.yml
+# yamllint disable rule:line-length
 ---
 
 description: set contents of ~/.terraformrc from TFE_TOKEN environment variable.

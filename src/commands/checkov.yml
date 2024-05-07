@@ -1,4 +1,4 @@
-# src/commands/checkov.yaml
+# src/commands/checkov.yml
 # yamllint disable rule:line-length
 ---
 

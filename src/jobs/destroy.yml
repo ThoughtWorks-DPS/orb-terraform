@@ -1,4 +1,4 @@
-# /src/jobs/destroy.yaml
+# /src/jobs/destroy.yml
 # yamllint disable rule:line-length
 ---
 description: >
@@ -131,7 +131,7 @@ steps:
       condition: << parameters.before-destroy >>
       working_directory: << parameters.working-directory >>
       steps: << parameters.before-destroy >>
-  - packages:
+  - install:
       terraform-version: << parameters.terraform-version >>
   - run:
       name: terraform init
