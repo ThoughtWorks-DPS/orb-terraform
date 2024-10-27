@@ -10,10 +10,13 @@ description: >
   - Set desired terraform version. Default is the version installed on the executor.
   - Specify a working-directory, default is .
   - Select a terraform workspace, default is none.
-  - Use your own docker image executor. Default is twdps/circleci-infra-aws
+  - Use your own docker image executor. Default is twdps/circleci-infra-aws:alpine-stable
   - Set an executor resource-class, default is medium
   - Set the executor shell process launch configuration, default is '/bin/bash -eo pipefail'
+  - Set name of human readable plan file. Default is tfplan.json
   - Set a desired version and custom args for checkov and snyk scans of plan output
+
+  Will store binary and human readable plan under plans-${CIRCLE_BUILD_NUM} workspace folder.
 
   Note: Does not include full static code analysis hooks. Use the included
   static-analysis job during a ci phase.
@@ -126,7 +129,7 @@ parameters:
   terraform-plan-outfile:
     description: Filename for output results from terraform plan.
     type: string
-    default: tfplan.json
+    default: tfplan-${CIRCLE_BUILD_NUM}.json
 
   snyk-scan:
     description: Perform snyk scan of terraform plan.
@@ -229,8 +232,11 @@ steps:
         terraform plan \
           <<#parameters.terraform-var-file>> -var-file=<< parameters.terraform-var-file >> <</parameters.terraform-var-file>> \
           <<#parameters.terraform-plan-additional-args>> << parameters.terraform-plan-additional-args >> <</parameters.terraform-plan-additional-args>> \
-          --out tfplan.binary
+          --out plans-${CIRCLE_BUILD_NUM}/tfplan.binary
         terraform show -json tfplan.binary | jq '.' > << parameters.terraform-plan-outfile >>
+  - store_artifacts:
+      path: << parameters.terraform-plan-outfile >>
+      destination: << parameters.terraform-plan-outfile >>
   - when:
       name: run checkov scan of terraform source files
       condition: << parameters.checkov-scan >>
@@ -248,7 +254,7 @@ steps:
             snyk-token: << parameters.snyk-token >>
             snyk-organization: << parameters.snyk-organization >>
             snyk-additional-args: << parameters.snyk-additional-args >>
-            terraform-plan-outfile: << parameters.terraform-plan-outfile >>
+            terraform-plan-outfile: plans-${CIRCLE_BUILD_NUM}/<< parameters.terraform-plan-outfile >>
   - when:
       name: Run after-plan lifecycle hook steps
       condition: << parameters.after-plan >>

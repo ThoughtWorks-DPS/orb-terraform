@@ -13,6 +13,8 @@ description: >
   - Specify a working-directory, default is .
   - Select a terraform workspace, default is none.
 
+  Will apply plan binary from plans-${CIRCLE_BUILD_NUM} workspace folder unless override.
+
   Note: Does not include full static code analysis hooks or terrafrom plan. Use the included
   static-analysis and plan jobs.
 

@@ -90,15 +90,15 @@ parameters:
   terraform-version:
     description: |
       If you specify a specific version, it will be installed and used by
-      all orb terraform functions. Leave blank or specify version "installed"
-      to use the version already installed on the executor.
+      all orb terraform functions. Leave blank to use the version already
+      installed on the executor.
     type: string
     default: ""
 
   terraform-init-additional-args:
     description: |
       Include any additional terraform init command arguments.
-      Default is -backend=false.
+      Default during static-code-analysis is -backend=false.
     type: string
     default: -backend=false
 
@@ -110,7 +110,7 @@ parameters:
   tflint-version:
     description: |
       Providing a tflint version results in a tflint scan of the repo using
-      the desired version. Specify version "installed" to use the version
+      the desired version. Leave blank to use the version
       already installed on the executor.
     type: string
     default: ""
@@ -145,7 +145,7 @@ parameters:
   trivy-version:
     description: |
       Providing a trivy version results in a trivy scan of the repo using
-      the desired version. Specify version "installed" to use the version
+      the desired version. Leave blank to use the version
       already installed on the executor.
     type: string
     default: ""
@@ -164,7 +164,7 @@ parameters:
   snyk-version:
     description: |
       Providing a snyk version results in a snyk scan of the repo using
-      the desired version. Specify version "installed" to use the version
+      the desired version. Leave blank to use the version
       already installed on the executor.
     type: string
     default: ""
@@ -193,7 +193,7 @@ parameters:
   checkov-version:
     description: |
       Providing a checkov version results in a checkov scan of the repo using
-      the desired version. Specify version "installed" to use the version
+      the desired version. Leave blank to use the version
       already installed on the executor.
     type: string
     default: ""
@@ -211,7 +211,7 @@ parameters:
   terrascan-version:
     description: |
       Providing a terrascan version results in a terrascan scan of the repo using
-      the desired version. Specify version "installed" to use the version
+      the desired version. Leave blank to use the version
       already installed on the executor.
     type: string
     default: ""
@@ -247,7 +247,7 @@ parameters:
   infracost-version:
     description: |
       Providing a infracost version results in a infracost scan of the repo using
-      the desired version. Specify version "installed" to use the version
+      the desired version. Leave blank to use the version
       already installed on the executor.
     type: string
     default: ""
