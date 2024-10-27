@@ -232,7 +232,7 @@ steps:
         terraform plan \
           <<#parameters.terraform-var-file>> -var-file=<< parameters.terraform-var-file >> <</parameters.terraform-var-file>> \
           <<#parameters.terraform-plan-additional-args>> << parameters.terraform-plan-additional-args >> <</parameters.terraform-plan-additional-args>> \
-          --out plans-${CIRCLE_BUILD_NUM}/tfplan.binary
+          --out tfplan.binary
         terraform show -json tfplan.binary | jq '.' > << parameters.terraform-plan-outfile >>
   - store_artifacts:
       path: << parameters.terraform-plan-outfile >>
