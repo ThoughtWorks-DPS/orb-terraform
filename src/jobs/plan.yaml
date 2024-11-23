@@ -129,7 +129,7 @@ parameters:
   terraform-plan-outfile:
     description: Filename for output results from terraform plan.
     type: string
-    default: tfplan-${CIRCLE_BUILD_NUM}.json
+    default: tfplan.json
 
   snyk-scan:
     description: Perform snyk scan of terraform plan.
@@ -254,7 +254,7 @@ steps:
             snyk-token: << parameters.snyk-token >>
             snyk-organization: << parameters.snyk-organization >>
             snyk-additional-args: << parameters.snyk-additional-args >>
-            terraform-plan-outfile: plans-${CIRCLE_BUILD_NUM}/<< parameters.terraform-plan-outfile >>
+            terraform-plan-outfile: << parameters.terraform-plan-outfile >>
   - when:
       name: Run after-plan lifecycle hook steps
       condition: << parameters.after-plan >>
